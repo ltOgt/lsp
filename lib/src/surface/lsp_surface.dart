@@ -1,14 +1,18 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:lsp/src/connector/base_connector.dart';
+import 'package:lsp/src/semantics/token_decoder.dart';
 import 'package:lsp/src/semantics/token_legend/token_mods.dart';
 import 'package:lsp/src/semantics/token_legend/token_types.dart';
 import 'dart:io';
 
 import 'package:lsp/src/surface/response/base_response.dart';
 import 'package:lsp/src/surface/response/init_response.dart';
+import 'package:lsp/src/surface/response/text_document/semantic_full_response.dart';
 
 /// ID to match request to respnse.
 /// This is needed since request <i> may take longer than <i+1>
@@ -132,7 +136,21 @@ class LspSurface {
   }
 
   // ====================================================================
+  /// Get [SemanticTokenType]s and [SemanticTokenModifier]s for the whole file at [filePath].
+  /// Use [SemanticTokenDecoder] to decode the [SemanticTokenFullResponse.data].
+  ///
+  /// https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#semanticTokens_fullRequest
+  Future<SemanticTokenFullResponse> textDocument_semanticTokens_full({required String filePath}) async {
+    var textDocumentIdentifier = {
+      "uri": "file://" + filePath,
+    };
+    var semanticTokenParams = {
+      "textDocument": textDocumentIdentifier,
+    };
 
+    final res = await _requestCompleter.sendRequest("textDocument/semanticTokens/full", semanticTokenParams);
+    return SemanticTokenFullResponse(response: res);
+  }
 }
 
 // =============================================================================

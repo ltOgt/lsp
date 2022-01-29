@@ -5,9 +5,9 @@ class InitResponse extends BaseResponse {
     required LspResponse response,
   }) : super(response: response);
 
-  Map get capabilities => result!["capabilities"]!;
-  Map get semanticTokensProvider => capabilities["semanticTokensProvider"]!;
-  Map get semanticTokensLegend => semanticTokensProvider["legend"]!;
-  List<String> get semanticTokenTypes => (semanticTokensLegend["tokenTypes"]! as List<dynamic>).cast();
-  List<String> get semanticTokenModifiers => (semanticTokensLegend["tokenModifiers"]! as List<dynamic>).cast();
+  Map get _capabilities => result!["capabilities"]!;
+  Map get _semanticTokensProvider => _capabilities["semanticTokensProvider"]!;
+  Map get _semanticTokensLegend => _semanticTokensProvider["legend"]!;
+  List<String> get semanticTokenTypes => (_semanticTokensLegend["tokenTypes"]! as List<dynamic>).cast();
+  List<String> get semanticTokenModifiers => (_semanticTokensLegend["tokenModifiers"]! as List<dynamic>).cast();
 }
