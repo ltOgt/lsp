@@ -12,6 +12,7 @@ import 'dart:io';
 
 import 'package:lsp/src/surface/response/base_response.dart';
 import 'package:lsp/src/surface/response/init_response.dart';
+import 'package:lsp/src/surface/response/text_document/definition_response.dart';
 import 'package:lsp/src/surface/response/text_document/semantic_full_response.dart';
 
 /// ID to match request to respnse.
@@ -150,6 +151,35 @@ class LspSurface {
 
     final res = await _requestCompleter.sendRequest("textDocument/semanticTokens/full", semanticTokenParams);
     return SemanticTokenFullResponse(response: res);
+  }
+
+  /// Request the location of the definition of the symbol under the cursor.
+  ///
+  /// [filePath] points to the source file.
+  /// [line] is a zero based offset for the line the cursor is in (first line ^= 0)
+  /// [character] is a zero based offset for the cursor inside the line (before first character ^= 0)
+  ///
+  /// https://microsoft.github.io/language-server-protocol/specification#textDocument_definition
+  /// https://microsoft.github.io/language-server-protocol/specification#textDocumentPositionParams
+  Future<DefinitionResponse> textDocument_definition({
+    required String filePath,
+    required int line,
+    required int character,
+  }) async {
+    var position = {
+      "line": line,
+      "character": character,
+    };
+    var textDocumentIdentifier = {
+      "uri": "file://" + filePath,
+    };
+    var textDocumentPositionParams = {
+      "textDocument": textDocumentIdentifier,
+      "position": position,
+    };
+
+    final res = await _requestCompleter.sendRequest("textDocument/definition", textDocumentPositionParams);
+    return DefinitionResponse(response: res);
   }
 }
 
