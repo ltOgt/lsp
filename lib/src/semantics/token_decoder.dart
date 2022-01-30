@@ -1,4 +1,4 @@
-import 'token.dart';
+import '../object/semantic/token.dart';
 
 class SemanticTokenDecoder {
   /// Decode [SemanticToken]s from `List<int>[<int_relativeRow>, <int_relativeStart>, <int_length>, <int_tokenType>, <bitmask_tokenModifiers>]`.

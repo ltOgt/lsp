@@ -15,3 +15,10 @@ export 'src/surface/response/init_response.dart';
 // For extracting semantic tokens and modifiers
 export 'src/semantics/token_legend/token_types.dart';
 export 'src/semantics/token_legend/token_mods.dart';
+
+// =============================================================================
+// Containers to encapsulate data packages
+export 'src/object/file/file_location.dart';
+export 'src/object/file/file_range.dart';
+export 'src/object/file/file_position.dart';
+export 'src/object/semantic/token.dart';
