@@ -55,6 +55,8 @@ class LspSurface {
 
   /// Launch the Connection handler.
   /// DONT FORGET TO CALL [dispose] when done.
+  ///
+  /// Throws [LspInitializationException] on failed initialziation.
   static Future<LspSurface> start({
     required LspConnectorBase lspConnector,
     required String rootPath,
@@ -238,7 +240,7 @@ class _RequestCompleter {
   ///
   /// Returns a Future that will complete once the matching response arrives.
   Future<LspResponse> sendRequest(String method, Map params) {
-    print("[$pid] sending: $method");
+    print("[$pid] <$_currentId> sending: $method");
 
     var content = {
       "jsonrpc": "2.0",
@@ -267,7 +269,9 @@ class _RequestCompleter {
 
     /// Create a completer and listen to stdout to complete once a response arives
     final completer = Completer<LspResponse>();
-    _responses[_currentId++] = completer;
+    _responses[_currentId] = completer;
+
+    _currentId += 1;
     return completer.future;
   }
 
