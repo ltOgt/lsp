@@ -27,13 +27,15 @@ Future<LspSurface> init() {
 void main() {
   group('Surface - Dart Connector:', () {
     test('Initiate Connection', () async {
+      late LspSurface surface;
       try {
-        await init();
+        surface = await init();
       } on LspInitializationException catch (_) {
         expect(false, isTrue);
         return;
       }
       expect(true, isTrue);
+      surface.dispose();
     });
 
     test('Semantic Token Legend', () async {
@@ -72,6 +74,7 @@ void main() {
         "interpolation",
         "void"
       ]);
+      surface.dispose();
     });
 
     test('Semantic Token Request + Decode', () async {
@@ -88,6 +91,8 @@ void main() {
       expect(surface.semanticTokenLegend.tokenTypes[testFieldToken.tokenType], equals("property"));
       expect(surface.semanticTokenLegend.tokenModifiers[testFieldToken.tokenModifiers[0]], equals("declaration"));
       expect(surface.semanticTokenLegend.tokenModifiers[testFieldToken.tokenModifiers[1]], equals("instance"));
+
+      surface.dispose();
     });
   });
 }
