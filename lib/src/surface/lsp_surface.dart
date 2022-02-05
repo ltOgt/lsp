@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:lsp/lsp.dart';
 import 'package:lsp/src/connector/base_connector.dart';
 import 'package:lsp/src/semantics/token_decoder.dart';
 import 'package:lsp/src/semantics/token_legend/token_mods.dart';
@@ -33,19 +34,9 @@ class LspSurface {
   /// Also async matches requests and responses via their id.
   final _RequestCompleter _requestCompleter;
 
-  /**
-     https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#initializeResult
-     https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#serverCapabilities
-     https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#semanticTokensOptions
-     https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#semanticTokensLegend
-     */
-  /// Token types like "class", "type", "enumMember", ...
-  /// See [SemanticTokenType].
-  late final List<String> semanticTokenTypes;
-
-  /// Token modifiers on top of token type, like "private", "declaration", "deprecated", ...
-  /// See [SemanticTokenModifier]
-  late final List<String> semanticTokenModifiers;
+  /// Legend provided during lsp initialization.
+  /// Needed to resolve eventual [SemanticToken]s, which contain only indexes to this legend.
+  late final SemanticTokenLegend semanticTokenLegend;
 
   LspSurface._({
     required this.lspConnector,
@@ -93,8 +84,10 @@ class LspSurface {
     }
 
     // Store semantic token infos
-    lsm.semanticTokenTypes = r1.semanticTokenTypes;
-    lsm.semanticTokenModifiers = r1.semanticTokenModifiers;
+    lsm.semanticTokenLegend = SemanticTokenLegend(
+      tokenTypes: r1.semanticTokenTypes,
+      tokenModifiers: r1.semanticTokenModifiers,
+    );
 
     return lsm;
   }

@@ -1,3 +1,5 @@
+import 'package:lsp/lsp.dart';
+
 /// Semantic Token.
 /// Created by [SemanticTokenDecoder] from [FileTokensEncoded].
 /// Part of [FileTokensDecoded].
@@ -5,8 +7,8 @@
 /// [row] is the absolute row of the token in the corresponding file.
 /// [start] is the absolute start position of the token in that row.
 /// [length] is the absoulte length of the token.
-/// [tokenType] needs to be resolved via [TokenLegend().tokenType]
-/// [tokenModifiers] need to be resolved via [TokenLegend().tokenModifiers]
+/// [tokenType] needs to be resolved via [SemanticTokenLegend.tokenTypes]
+/// [tokenModifiers] need to be resolved via [SemanticTokenLegend.tokenModifiers]
 class SemanticToken {
   final int row;
   final int start;

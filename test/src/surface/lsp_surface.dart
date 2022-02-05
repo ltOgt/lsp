@@ -25,7 +25,7 @@ Future<LspSurface> init() {
 }
 
 void main() {
-  group('Surface - Dart Connector', () {
+  group('Surface - Dart Connector:', () {
     test('Initiate Connection', () async {
       try {
         await init();
@@ -34,6 +34,44 @@ void main() {
         return;
       }
       expect(true, isTrue);
+    });
+
+    test('Semantic Token Legend', () async {
+      final surface = await init();
+      expect(surface.semanticTokenLegend.tokenTypes, [
+        "annotation",
+        "keyword",
+        "class",
+        "comment",
+        "method",
+        "variable",
+        "parameter",
+        "enum",
+        "enumMember",
+        "type",
+        "source",
+        "property",
+        "namespace",
+        "boolean",
+        "number",
+        "string",
+        "function",
+        "typeParameter"
+      ]);
+      expect(surface.semanticTokenLegend.tokenModifiers, [
+        "documentation",
+        "constructor",
+        "declaration",
+        "importPrefix",
+        "instance",
+        "static",
+        "escape",
+        "annotation",
+        "control",
+        "label",
+        "interpolation",
+        "void"
+      ]);
     });
 
     test('Semantic Token Request + Decode', () async {
@@ -47,9 +85,9 @@ void main() {
       // "testField" declaration
       final testFieldToken = tokens[7];
 
-      expect(surface.semanticTokenTypes[testFieldToken.tokenType], equals("property"));
-      expect(surface.semanticTokenModifiers[testFieldToken.tokenModifiers[0]], equals("declaration"));
-      expect(surface.semanticTokenModifiers[testFieldToken.tokenModifiers[1]], equals("instance"));
+      expect(surface.semanticTokenLegend.tokenTypes[testFieldToken.tokenType], equals("property"));
+      expect(surface.semanticTokenLegend.tokenModifiers[testFieldToken.tokenModifiers[0]], equals("declaration"));
+      expect(surface.semanticTokenLegend.tokenModifiers[testFieldToken.tokenModifiers[1]], equals("instance"));
     });
   });
 }
