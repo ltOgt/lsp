@@ -15,13 +15,13 @@ class FilePosition {
     required this.character,
   });
 
-  Map encode() => {
-        key_line: line,
-        key_character: character,
+  Map<String, Object> encode() => {
+        key_line: "$line",
+        key_character: "$character",
       };
 
-  static FilePosition decode(Map m) => FilePosition(
-        line: m[key_line]!,
-        character: m[key_character]!,
+  static FilePosition decode(Map<String, Object> m) => FilePosition(
+        line: int.parse(m[key_line]! as String),
+        character: int.parse(m[key_character]! as String),
       );
 }

@@ -29,13 +29,13 @@ class FileRange {
     required this.end,
   });
 
-  Map encode() => {
+  Map<String, Object> encode() => {
         key_start: start.encode(),
         key_end: end.encode(),
       };
 
-  static FileRange decode(Map m) => FileRange(
-        start: FilePosition.decode(m[key_start]!),
-        end: FilePosition.decode(m[key_end]!),
+  static FileRange decode(Map<String, Object> m) => FileRange(
+        start: FilePosition.decode(m[key_start]! as Map<String, Object>),
+        end: FilePosition.decode(m[key_end]! as Map<String, Object>),
       );
 }

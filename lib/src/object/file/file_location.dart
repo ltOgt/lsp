@@ -16,13 +16,13 @@ class FileLocation {
     required this.range,
   });
 
-  Map encode() => {
+  Map<String, Object> encode() => {
         key_path: path,
         key_range: range.encode(),
       };
 
-  static FileLocation decode(Map m) => FileLocation(
-        path: m[key_path]!,
-        range: FileRange.decode(m[key_range]!),
+  static FileLocation decode(Map<String, Object> m) => FileLocation(
+        path: m[key_path]! as String,
+        range: FileRange.decode(m[key_range]! as Map<String, Object>),
       );
 }

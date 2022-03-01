@@ -24,13 +24,13 @@ class SemanticTokenLegend {
     required this.tokenModifiers,
   });
 
-  Map encode() => {
+  Map<String, Object> encode() => {
         k_tokenTypes: tokenTypes,
         k_tokenModifiers: tokenModifiers,
       };
 
-  static SemanticTokenLegend decode(Map m) => SemanticTokenLegend(
-        tokenTypes: (m[k_tokenTypes]! as List<dynamic>).cast(),
-        tokenModifiers: (m[k_tokenModifiers]! as List<dynamic>).cast(),
+  static SemanticTokenLegend decode(Map<String, Object> m) => SemanticTokenLegend(
+        tokenTypes: (m[k_tokenTypes]! as List).cast(),
+        tokenModifiers: (m[k_tokenModifiers]! as List).cast(),
       );
 }
