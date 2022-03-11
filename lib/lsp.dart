@@ -18,6 +18,7 @@ export 'src/surface/response/text_document/semantic_full_response.dart';
 export 'src/semantics/token_legend/token_types.dart';
 export 'src/semantics/token_legend/token_mods.dart';
 export 'src/semantics/token_legend/token_legend.dart';
+export '/src/semantics/token_decoder.dart';
 
 // =============================================================================
 // Containers to encapsulate data packages
