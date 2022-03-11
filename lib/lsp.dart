@@ -10,6 +10,8 @@ export 'src/connector/dart_connector.dart';
 // For interacting with the LSP server
 export 'src/surface/lsp_surface.dart';
 export 'src/surface/response/init_response.dart';
+export 'src/surface/response/text_document/definition_response.dart';
+export 'src/surface/response/text_document/semantic_full_response.dart';
 
 // =============================================================================
 // For extracting semantic tokens and modifiers
