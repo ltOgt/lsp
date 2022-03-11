@@ -5,16 +5,10 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:lsp/lsp.dart';
-import 'package:lsp/src/connector/base_connector.dart';
 import 'package:lsp/src/semantics/token_decoder.dart';
-import 'package:lsp/src/semantics/token_legend/token_mods.dart';
-import 'package:lsp/src/semantics/token_legend/token_types.dart';
 import 'dart:io';
 
 import 'package:lsp/src/surface/response/base_response.dart';
-import 'package:lsp/src/surface/response/init_response.dart';
-import 'package:lsp/src/surface/response/text_document/definition_response.dart';
-import 'package:lsp/src/surface/response/text_document/semantic_full_response.dart';
 
 /// ID to match request to respnse.
 /// This is needed since request <i> may take longer than <i+1>
