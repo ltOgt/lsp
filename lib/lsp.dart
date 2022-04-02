@@ -12,6 +12,7 @@ export 'src/surface/lsp_surface.dart';
 export 'src/surface/response/init_response.dart';
 export 'src/surface/response/text_document/definition_response.dart';
 export 'src/surface/response/text_document/semantic_full_response.dart';
+export 'src/surface/response/text_document/reference_response.dart';
 
 // =============================================================================
 // For extracting semantic tokens and modifiers

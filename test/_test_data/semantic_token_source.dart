@@ -7,3 +7,7 @@ class TestClass {
     required this.testField,
   });
 }
+
+void main(List<String> args) {
+  TestClass testClass = TestClass(testField: "testField");
+}
