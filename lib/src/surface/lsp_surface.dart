@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:lsp/lsp.dart';
-import 'package:lsp/src/semantics/token_decoder.dart';
 import 'dart:io';
 
 import 'package:lsp/src/surface/response/base_response.dart';
@@ -169,6 +168,41 @@ class LspSurface {
 
     final res = await _requestCompleter.sendRequest("textDocument/definition", textDocumentPositionParams);
     return DefinitionResponse(response: res);
+  }
+
+  /// Request the location of all project-wide references of the symbol under the cursor.
+  ///
+  /// [filePath] points to the source file.
+  /// [line] is a zero based offset for the line the cursor is in (first line ^= 0)
+  /// [character] is a zero based offset for the cursor inside the line (before first character ^= 0)
+  /// [includeDeclaration] toggles whether the declaration of the requested symbol should be included in the results.
+  ///
+  /// https://microsoft.github.io/language-server-protocol/specification#textDocument_references
+  /// https://microsoft.github.io/language-server-protocol/specification#textDocumentPositionParams
+  Future<ReferenceResponse> textDocument_references({
+    required String filePath,
+    required int line,
+    required int character,
+    required bool includeDeclaration,
+  }) async {
+    var position = {
+      "line": line,
+      "character": character,
+    };
+    var textDocumentIdentifier = {
+      "uri": "file://" + filePath,
+    };
+    var referenceContext = {
+      "includeDeclaration": includeDeclaration,
+    };
+    var referenceParams = {
+      "textDocument": textDocumentIdentifier,
+      "position": position,
+      "context": referenceContext,
+    };
+
+    final res = await _requestCompleter.sendRequest("textDocument/references", referenceParams);
+    return ReferenceResponse(response: res);
   }
 }
 
