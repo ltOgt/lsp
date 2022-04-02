@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 /// A position inside a file.
 ///
 /// [line] is the zero based line index of the cursor.
@@ -24,4 +25,14 @@ class FilePosition {
         line: int.parse(m[key_line]! as String),
         character: int.parse(m[key_character]! as String),
       );
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is FilePosition && other.line == line && other.character == character;
+  }
+
+  @override
+  int get hashCode => line.hashCode ^ character.hashCode;
 }

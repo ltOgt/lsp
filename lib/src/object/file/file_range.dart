@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'file_position.dart';
 
 /// A position inside a file.
@@ -38,4 +39,14 @@ class FileRange {
         start: FilePosition.decode(m[key_start]! as Map<String, Object>),
         end: FilePosition.decode(m[key_end]! as Map<String, Object>),
       );
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is FileRange && other.start == start && other.end == end;
+  }
+
+  @override
+  int get hashCode => start.hashCode ^ end.hashCode;
 }

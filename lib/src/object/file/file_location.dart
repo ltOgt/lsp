@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'file_range.dart';
 
 /// Contains the [path] to a file and a [range] inside that file.
@@ -25,4 +26,14 @@ class FileLocation {
         path: m[key_path]! as String,
         range: FileRange.decode(m[key_range]! as Map<String, Object>),
       );
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is FileLocation && other.path == path && other.range == range;
+  }
+
+  @override
+  int get hashCode => path.hashCode ^ range.hashCode;
 }
