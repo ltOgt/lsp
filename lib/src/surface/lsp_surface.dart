@@ -31,6 +31,10 @@ class LspSurface {
   /// Needed to resolve eventual [SemanticToken]s, which contain only indexes to this legend.
   late final SemanticTokenLegend semanticTokenLegend;
 
+  /// Root path for the project that should be analyzed
+  //. Not really needed after [start], but can be exposed to consumers
+  late final String rootPath;
+
   LspSurface._({
     required this.lspConnector,
     required this.lspProcess,
@@ -81,6 +85,9 @@ class LspSurface {
       tokenTypes: r1.semanticTokenTypes,
       tokenModifiers: r1.semanticTokenModifiers,
     );
+
+    // Store root path as a nice to have
+    lsm.rootPath = rootPath;
 
     return lsm;
   }
