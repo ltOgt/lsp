@@ -14,6 +14,7 @@ class LspConnectorDart extends LspConnectorBase {
 
   @override
   Future<Process> startProcess() {
+    // https://stackoverflow.com/a/67797686/7215915 for how to use this on apple
     return Process.start(
         "dart", [analysisServerPath, "--lsp", "--client-id", clientId, "--client-version", clientVersion]);
   }

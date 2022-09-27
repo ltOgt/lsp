@@ -4,6 +4,10 @@ class SemanticTokenDecoder {
   /// Decode [SemanticToken]s from `List<int>[<int_relativeRow>, <int_relativeStart>, <int_length>, <int_tokenType>, <bitmask_tokenModifiers>]`.
   ///
   /// https://microsoft.github.io/language-server-protocol/specifications/specification-3-16/#textDocument_semanticTokens
+  ///
+  /// E.g:
+  ///    first-      second-     third-    -token
+  /// [  2,5,3,0,3,  0,5,4,1,0,  3,2,7,2,0 ]
   static List<SemanticToken> decodeTokens(List<int> encodedTokens) {
     List<SemanticToken> tokens = [];
     SemanticToken previous = SemanticToken(row: 0, start: 0, length: 0, tokenType: 0, tokenModifiers: []);
