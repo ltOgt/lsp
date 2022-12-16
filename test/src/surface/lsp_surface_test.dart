@@ -86,7 +86,7 @@ void main() {
         filePath: SEMANTIC_TEST_FILE_PATH,
       );
       List<SemanticToken> tokens = SemanticTokenDecoder.decodeTokens(r.data);
-      expect(tokens.length, equals(22));
+      expect(tokens.length, equals(23));
 
       // "testField" declaration
       final testFieldToken = tokens[7];
@@ -150,4 +150,115 @@ void main() {
       );
     });
   });
+
+  group('JsonExtractor', () {
+    /// STDOUT can contain the following messages
+    ///
+    /// (1)
+    /// ```
+    /// {<message>}
+    /// ```
+    ///
+    /// (2)
+    /// ```
+    /// Content-Length: <bytes>
+    /// Content-Type: application/vscode-jsonrpc; charset=utf-8
+    /// ```
+    ///
+    /// (3)
+    /// ```
+    /// Content-Length: <bytes>
+    /// Content-Type: application/vscode-jsonrpc; charset=utf-8
+    ///
+    /// {<message>}Content-Length: <bytes>
+    /// Content-Type: application/vscode-jsonrpc; charset=utf-8
+    ///
+    /// {<message>}Content-Length: <bytes>
+    /// Content-Type: application/vscode-jsonrpc; charset=utf-8
+    ///
+    /// ...
+    /// {<message>}
+    /// ```
+    ///
+    /// (1) should return `[Map]`
+    /// (2) should return `[]`
+    /// (3) should return `[Map, Map, ..., Map]`
+    test('simple message', () {
+      final msgs = JsonExtractor.extractJson(_kSimpleMsg);
+      expect(msgs, equals(_kSimpleMsgExpected));
+    });
+
+    test('empty message', () {
+      final msgs = JsonExtractor.extractJson(_kEmptyMsg);
+      expect(msgs, equals(_kEmptyMsgExpected));
+    });
+
+    test('multiple messages', () {
+      final msgs = JsonExtractor.extractJson(_kMultiMsg);
+      expect(msgs, equals(_kMultiMsgExpected));
+    });
+  });
 }
+
+const _kSimpleMsg =
+    '{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///Users/omni/development/flutter/packages/flutter/test_release/foundation/memory_allocations_test.dart"}}';
+const _kSimpleMsgExpected = [
+  {
+    "jsonrpc": "2.0",
+    "method": "textDocument/publishDiagnostics",
+    "params": {
+      "diagnostics": [],
+      "uri":
+          "file:///Users/omni/development/flutter/packages/flutter/test_release/foundation/memory_allocations_test.dart"
+    }
+  }
+];
+
+const _kEmptyMsg = """
+Content-Length: 187
+Content-Type: application/vscode-jsonrpc; charset=utf-8
+
+
+
+""";
+const _kEmptyMsgExpected = [];
+
+const _kMultiMsg = """
+Content-Length: 202
+Content-Type: application/vscode-jsonrpc; charset=utf-8
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///Users/omni/development/flutter/packages/flutter/test_release/widgets/memory_allocations_test.dart"}}Content-Length: 181
+Content-Type: application/vscode-jsonrpc; charset=utf-8
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///Users/omni/development/flutter/packages/flutter/test_profile/basic_test.dart"}}Content-Length: 175
+Content-Type: application/vscode-jsonrpc; charset=utf-8
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///Users/omni/development/flutter/packages/flutter/test/_goldens_web.dart"}}
+
+""";
+const _kMultiMsgExpected = [
+  {
+    "jsonrpc": "2.0",
+    "method": "textDocument/publishDiagnostics",
+    "params": {
+      "diagnostics": [],
+      "uri": "file:///Users/omni/development/flutter/packages/flutter/test_release/widgets/memory_allocations_test.dart"
+    }
+  },
+  {
+    "jsonrpc": "2.0",
+    "method": "textDocument/publishDiagnostics",
+    "params": {
+      "diagnostics": [],
+      "uri": "file:///Users/omni/development/flutter/packages/flutter/test_profile/basic_test.dart"
+    }
+  },
+  {
+    "jsonrpc": "2.0",
+    "method": "textDocument/publishDiagnostics",
+    "params": {
+      "diagnostics": [],
+      "uri": "file:///Users/omni/development/flutter/packages/flutter/test/_goldens_web.dart"
+    }
+  },
+];

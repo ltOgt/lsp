@@ -222,7 +222,6 @@ class _RequestCompleter {
   static const Utf8Encoder _encoderUTF8 = Utf8Encoder();
   static const AsciiEncoder _encoderASCII = AsciiEncoder();
   static const Utf8Decoder _decoderUTF8 = Utf8Decoder();
-  static const JsonDecoder _decoderJSON = JsonDecoder();
 
   // ===========================================================================
 
@@ -309,7 +308,7 @@ class _RequestCompleter {
     String r = _decoderUTF8.convert(response);
 
     // Get response
-    List<Map> jsons = _extractJson(r);
+    List<Map> jsons = JsonExtractor.extractJson(r);
     for (Map json in jsons) {
       if (false == json.containsKey("id")) {
         // Skip other messages for now
@@ -330,6 +329,12 @@ class _RequestCompleter {
     String r = _decoderUTF8.convert(response);
     print("LSP ERROR: $r");
   }
+}
+
+class JsonExtractor {
+  JsonExtractor._();
+
+  static const JsonDecoder _decoderJSON = JsonDecoder();
 
   /// STDOUT can contain the following messages
   ///
@@ -362,7 +367,7 @@ class _RequestCompleter {
   /// (1) should return `[Map]`
   /// (2) should return `[]`
   /// (3) should return `[Map, Map, ..., Map]`
-  List<Map> _extractJson(String potentialMessages) {
+  static List<Map> extractJson(String potentialMessages) {
     List<Map> r = [];
     try {
       for (String line in potentialMessages.split("\n")) {
