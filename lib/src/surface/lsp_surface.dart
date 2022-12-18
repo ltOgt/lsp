@@ -222,6 +222,7 @@ class _RequestCompleter {
   static const Utf8Encoder _encoderUTF8 = Utf8Encoder();
   static const AsciiEncoder _encoderASCII = AsciiEncoder();
   static const Utf8Decoder _decoderUTF8 = Utf8Decoder();
+  static final BufferedJsonExtractor _jsonExtractor = BufferedJsonExtractor();
 
   // ===========================================================================
 
@@ -303,16 +304,17 @@ class _RequestCompleter {
   }
 
   // ===========================================================================
-
   _handleResponse(List<int> response) {
     String r = _decoderUTF8.convert(response);
 
     // Get response
-    List<Map> jsons = JsonExtractor.extractJson(r);
+    List<Map> jsons = _jsonExtractor.extractJson(r);
     for (Map json in jsons) {
       if (false == json.containsKey("id")) {
         // Skip other messages for now
-        // § "{"method":"$/analyzerStatus","params":{"isAnalyzing":true},"jsonrpc":"2.0"}"
+        // § {"method":"$/analyzerStatus","params":{"isAnalyzing":true},"jsonrpc":"2.0"}
+        // § {"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics"...
+        // TODO should return diagnostics at least
       } else {
         int requestID = json["id"];
         if (_responses.containsKey(requestID)) {
@@ -331,10 +333,20 @@ class _RequestCompleter {
   }
 }
 
-class JsonExtractor {
-  JsonExtractor._();
-
+class BufferedJsonExtractor {
   static const JsonDecoder _decoderJSON = JsonDecoder();
+
+  BufferedJsonExtractor();
+
+  /// During [extractJson], a message may not have been fully resolved [*]
+  /// (Case (4))
+  ///
+  /// The unresolved part of the message will be buffered here for the next call.
+  /// It will then be used as the start of the next message.
+  ///
+  /// [*] compare https://github.com/dart-lang/sdk/issues/22440#issuecomment-108459624
+  /// [*] compare https://github.com/dart-lang/site-www/blob/ac4f7b33617db046968aaac666d0c81c288bedd3/src/_articles/libraries/creating-streams.md?plain=1#L60
+  String _unresolvedMessage = "";
 
   /// STDOUT can contain the following messages
   ///
@@ -364,19 +376,58 @@ class JsonExtractor {
   /// {<message>}
   /// ```
   ///
+  /// (4)
+  /// ```
+  /// // ----------------- Start of message A
+  /// Content-Length: <bytes>
+  /// Content-Type: application/vscode-jsonrpc; charset=utf-8
+  ///
+  /// {<message>}Content-Length: <bytes>
+  /// Content-Type: application/vscode-jsonrpc; charset=utf-8
+  ///
+  /// {<message start
+  /// // ----------------- End of message A
+  /// // ----------------- Start of message B
+  /// message end>}
+  /// // ----------------- End of message B
+  /// ```
+  ///
   /// (1) should return `[Map]`
   /// (2) should return `[]`
   /// (3) should return `[Map, Map, ..., Map]`
-  static List<Map> extractJson(String potentialMessages) {
+  /// (4) should return `[Map]` and `[Map]` on the next call
+  List<Map> extractJson(String potentialMessages) {
     List<Map> r = [];
     try {
-      for (String line in potentialMessages.split("\n")) {
+      for (String _line in potentialMessages.split(_rgx)) {
+        // Previous chunk may have contained the start of this one
+        final line = _unresolvedMessage + _line;
+
+        // Find the actual json part in the message
         int first = line.indexOf("{");
         int last = line.lastIndexOf("}") + 1;
-        if (first > -1 && last > -1) {
-          r.add(_decoderJSON.convert(
-            line.substring(first, last),
-          ));
+
+        if (first < 0 || last < 0) {
+          // missing open or close of json
+          _unresolvedMessage += line;
+        } else {
+          // If we have both open and close, its a good CHANCE the json is complete
+          // catch if thats not the case
+          try {
+            r.add(_decoderJSON.convert(
+              line.substring(first, last),
+            ));
+          } catch (_) {
+            _unresolvedMessage += line;
+            continue;
+          }
+
+          // if last is not the end of the message, split to next message
+          if (last != line.length) {
+            _unresolvedMessage = line.substring(last);
+          } else {
+            _unresolvedMessage = "";
+          }
         }
       }
     } catch (e) {
@@ -385,4 +436,6 @@ class JsonExtractor {
 
     return r;
   }
+
+  static final _rgx = RegExp(r"Content-Length: [0-9]+\nContent-Type: application/vscode.jsonrpc; charset=utf-8\n\n");
 }

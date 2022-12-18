@@ -184,18 +184,26 @@ void main() {
     /// (2) should return `[]`
     /// (3) should return `[Map, Map, ..., Map]`
     test('simple message', () {
-      final msgs = JsonExtractor.extractJson(_kSimpleMsg);
+      final msgs = BufferedJsonExtractor().extractJson(_kSimpleMsg);
       expect(msgs, equals(_kSimpleMsgExpected));
     });
 
     test('empty message', () {
-      final msgs = JsonExtractor.extractJson(_kEmptyMsg);
+      final msgs = BufferedJsonExtractor().extractJson(_kEmptyMsg);
       expect(msgs, equals(_kEmptyMsgExpected));
     });
 
     test('multiple messages', () {
-      final msgs = JsonExtractor.extractJson(_kMultiMsg);
+      final msgs = BufferedJsonExtractor().extractJson(_kMultiMsg);
       expect(msgs, equals(_kMultiMsgExpected));
+    });
+
+    test('chunked multiple messages', () {
+      final extractor = BufferedJsonExtractor();
+      final msgs1 = extractor.extractJson(_kChunkedMultiMsg1);
+      final msgs2 = extractor.extractJson(_kChunkedMultiMsg2);
+      final msgs3 = extractor.extractJson(_kChunkedMultiMsg3);
+      expect([...msgs1, ...msgs2, ...msgs3], equals(_kMultiMsgExpected));
     });
   });
 }
@@ -262,3 +270,18 @@ const _kMultiMsgExpected = [
     }
   },
 ];
+
+const _kChunkedMultiMsg1 = """
+Content-Length: 202
+Content-Type: application/vscode-jsonrpc; charset=utf-8
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///Users/omni/development/flutter/packages/flutter/test_release/widgets/memory_allocations_test.dart"}}Content-Length: 181
+Content-Type: application/vscode-jsonrpc; charset=utf-8
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///Users/omni/development/flutter/packages/flutter/test_profile/basic_test.dart"}""";
+const _kChunkedMultiMsg2 = """}Content-Length: 175
+Content-Type: application/vscode-jsonrpc; charset=utf-8
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics",""";
+const _kChunkedMultiMsg3 =
+    """"params":{"diagnostics":[],"uri":"file:///Users/omni/development/flutter/packages/flutter/test/_goldens_web.dart"}}""";
