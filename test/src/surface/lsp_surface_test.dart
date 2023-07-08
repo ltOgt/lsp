@@ -106,6 +106,7 @@ void main() {
         character: 10, // points at "TestClass"
         includeDeclaration: false,
       );
+      surface.dispose();
       expect(r.fileLocations.length, equals(4));
 
       void _expectRanges(FileLocation actual, FilePosition start, FilePosition end) {
