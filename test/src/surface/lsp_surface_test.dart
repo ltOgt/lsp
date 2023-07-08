@@ -10,10 +10,13 @@ const String ANALYSIS_PATH = DART_SDK_PATH + "bin/snapshots/analysis_server.dart
 const String ROOT_PATH = "/Users/omni/repos/package/lsp/";
 const String SEMANTIC_TEST_FILE_PATH = ROOT_PATH + "test/_test_data/semantic_token_source.dart";
 
-Future<LspSurface> init() {
+// TODO: some tests sometime fail when runnning the whole group
+//  test every one individually
+
+Future<LspSurface> init(String clientId) {
   final connector = LspConnectorDart(
     analysisServerPath: ANALYSIS_PATH,
-    clientId: "clientId",
+    clientId: clientId,
     clientVersion: "0.0.1",
   );
   return LspSurface.start(
@@ -32,7 +35,7 @@ void main() {
     test('Initiate Connection', () async {
       late LspSurface surface;
       try {
-        surface = await init();
+        surface = await init("t1");
       } on LspInitializationException catch (_) {
         expect(false, isTrue);
         return;
@@ -42,7 +45,7 @@ void main() {
     });
 
     test('Semantic Token Legend', () async {
-      final surface = await init();
+      final surface = await init("t2");
       expect(surface.semanticTokenLegend.tokenTypes, [
         "annotation",
         "keyword",
@@ -81,7 +84,7 @@ void main() {
     });
 
     test('Semantic Token Request + Decode', () async {
-      final LspSurface surface = await init();
+      final LspSurface surface = await init("t3");
       SemanticTokenFullResponse r = await surface.textDocument_semanticTokens_full(
         filePath: SEMANTIC_TEST_FILE_PATH,
       );
@@ -99,7 +102,7 @@ void main() {
     });
 
     test('Find all references', () async {
-      final LspSurface surface = await init();
+      final LspSurface surface = await init("t4");
       ReferenceResponse r = await surface.textDocument_references(
         filePath: SEMANTIC_TEST_FILE_PATH,
         line: 1,
