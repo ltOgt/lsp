@@ -8,10 +8,15 @@ import 'package:lsp/lsp.dart';
 import 'dart:io';
 
 import 'package:lsp/src/surface/response/base_response.dart';
+import 'package:lsp/src/surface/wireformat.dart';
 
 /// ID to match request to respnse.
 /// This is needed since request <i> may take longer than <i+1>
 typedef LspRequestId = int;
+
+/// Callback for messages from the Language Server that are
+/// no a response to a request.
+typedef MessageCallback = void Function(Map onResponseMessage);
 
 class LspInitializationException implements Exception {}
 
@@ -35,10 +40,13 @@ class LspSurface {
   //. Not really needed after [start], but can be exposed to consumers
   late final String rootPath;
 
+  final MessageCallback? onMessage;
+
   LspSurface._({
     required this.lspConnector,
     required this.lspProcess,
     required _RequestCompleter requestCompleter,
+    required this.onMessage,
   }) : _requestCompleter = requestCompleter;
 
   /// Launch the Connection handler.
@@ -49,18 +57,23 @@ class LspSurface {
     required LspConnectorBase lspConnector,
     required String rootPath,
     required Map clientCapabilities,
+    MessageCallback? onMessage,
   }) async {
     // Start process
     final process = await lspConnector.startProcess();
 
     // Setup request => response completer
-    final requestCompleter = _RequestCompleter(process: process);
+    final requestCompleter = _RequestCompleter(
+      process: process,
+      onMessage: onMessage,
+    );
 
     // Create object
     final lsm = LspSurface._(
       lspConnector: lspConnector,
       lspProcess: process,
       requestCompleter: requestCompleter,
+      onMessage: onMessage,
     );
 
     // Initialized LSP handshake
@@ -222,22 +235,25 @@ class _RequestCompleter {
   static const Utf8Encoder _encoderUTF8 = Utf8Encoder();
   static const AsciiEncoder _encoderASCII = AsciiEncoder();
   static const Utf8Decoder _decoderUTF8 = Utf8Decoder();
-  static final BufferedJsonExtractor _jsonExtractor = BufferedJsonExtractor();
 
   // ===========================================================================
 
   late final IOSink lspProcessStdin;
 
+  /// For non response messages
+  final MessageCallback? onMessage;
+
   // ===========================================================================
 
-  _RequestCompleter({required Process process}) {
+  _RequestCompleter({
+    required Process process,
+    required this.onMessage,
+  }) {
     /// Bind stdin / std out of process
-    process.stdout.listen(
-      _handleResponse,
-      onDone: () => print("StdOut done"),
-      onError: (e) => print("StdOut error <$e>"),
-      cancelOnError: false,
-    );
+    lspChannel(process.stdout, process.stdin).stream.listen(
+          _handleResponse,
+          cancelOnError: false,
+        );
     process.stderr.listen(
       _handleError,
       cancelOnError: false,
@@ -288,8 +304,8 @@ class _RequestCompleter {
 
       Each line of header ends with \r\n and header ends with \r\n
     */
-    const String DELIM = "\r\n";
-    String header = "Content-Length: ${contentUTF8.lengthInBytes}" + DELIM + DELIM;
+    const String kDelim = "\r\n";
+    String header = "Content-Length: ${contentUTF8.lengthInBytes}" + kDelim + kDelim;
     Uint8List headerASCII = _encoderASCII.convert(header);
 
     // Send message
@@ -304,25 +320,21 @@ class _RequestCompleter {
   }
 
   // ===========================================================================
-  _handleResponse(List<int> response) {
-    String r = _decoderUTF8.convert(response);
+  _handleResponse(String response) {
+    final json = jsonDecode(response);
 
-    // Get response
-    List<Map> jsons = _jsonExtractor.extractJson(r);
-    for (Map json in jsons) {
-      if (false == json.containsKey("id")) {
-        // Skip other messages for now
-        // § {"method":"$/analyzerStatus","params":{"isAnalyzing":true},"jsonrpc":"2.0"}
-        // § {"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics"...
-        // TODO should return diagnostics at least
+    if (false == json.containsKey("id")) {
+      // Skip other messages for now
+      // § {"method":"$/analyzerStatus","params":{"isAnalyzing":true},"jsonrpc":"2.0"}
+      // § {"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics"...
+      onMessage?.call(json);
+    } else {
+      int requestID = json["id"];
+      if (_responses.containsKey(requestID)) {
+        _responses[requestID]!.complete(LspResponse.fromMap(json));
+        _responses.remove(requestID);
       } else {
-        int requestID = json["id"];
-        if (_responses.containsKey(requestID)) {
-          _responses[requestID]!.complete(LspResponse.fromMap(json));
-          _responses.remove(requestID);
-        } else {
-          throw ("Received Response for Request that does not exist or has already completed: $requestID");
-        }
+        throw ("Received Response for Request that does not exist or has already completed: $requestID");
       }
     }
   }
@@ -331,111 +343,4 @@ class _RequestCompleter {
     String r = _decoderUTF8.convert(response);
     print("LSP ERROR: $r");
   }
-}
-
-class BufferedJsonExtractor {
-  static const JsonDecoder _decoderJSON = JsonDecoder();
-
-  BufferedJsonExtractor();
-
-  /// During [extractJson], a message may not have been fully resolved [*]
-  /// (Case (4))
-  ///
-  /// The unresolved part of the message will be buffered here for the next call.
-  /// It will then be used as the start of the next message.
-  ///
-  /// [*] compare https://github.com/dart-lang/sdk/issues/22440#issuecomment-108459624
-  /// [*] compare https://github.com/dart-lang/site-www/blob/ac4f7b33617db046968aaac666d0c81c288bedd3/src/_articles/libraries/creating-streams.md?plain=1#L60
-  String _unresolvedMessage = "";
-
-  /// STDOUT can contain the following messages
-  ///
-  /// (1)
-  /// ```
-  /// {<message>}
-  /// ```
-  ///
-  /// (2)
-  /// ```
-  /// Content-Length: <bytes>
-  /// Content-Type: application/vscode-jsonrpc; charset=utf-8
-  /// ```
-  ///
-  /// (3)
-  /// ```
-  /// Content-Length: <bytes>
-  /// Content-Type: application/vscode-jsonrpc; charset=utf-8
-  ///
-  /// {<message>}Content-Length: <bytes>
-  /// Content-Type: application/vscode-jsonrpc; charset=utf-8
-  ///
-  /// {<message>}Content-Length: <bytes>
-  /// Content-Type: application/vscode-jsonrpc; charset=utf-8
-  ///
-  /// ...
-  /// {<message>}
-  /// ```
-  ///
-  /// (4)
-  /// ```
-  /// // ----------------- Start of message A
-  /// Content-Length: <bytes>
-  /// Content-Type: application/vscode-jsonrpc; charset=utf-8
-  ///
-  /// {<message>}Content-Length: <bytes>
-  /// Content-Type: application/vscode-jsonrpc; charset=utf-8
-  ///
-  /// {<message start
-  /// // ----------------- End of message A
-  /// // ----------------- Start of message B
-  /// message end>}
-  /// // ----------------- End of message B
-  /// ```
-  ///
-  /// (1) should return `[Map]`
-  /// (2) should return `[]`
-  /// (3) should return `[Map, Map, ..., Map]`
-  /// (4) should return `[Map]` and `[Map]` on the next call
-  List<Map> extractJson(String potentialMessages) {
-    List<Map> r = [];
-    try {
-      for (String _line in potentialMessages.split(_rgx)) {
-        // Previous chunk may have contained the start of this one
-        final line = _unresolvedMessage + _line;
-
-        // Find the actual json part in the message
-        int first = line.indexOf("{");
-        int last = line.lastIndexOf("}") + 1;
-
-        if (first < 0 || last < 0) {
-          // missing open or close of json
-          _unresolvedMessage += line;
-        } else {
-          // If we have both open and close, its a good CHANCE the json is complete
-          // catch if thats not the case
-          try {
-            r.add(_decoderJSON.convert(
-              line.substring(first, last),
-            ));
-          } catch (_) {
-            _unresolvedMessage += line;
-            continue;
-          }
-
-          // if last is not the end of the message, split to next message
-          if (last != line.length) {
-            _unresolvedMessage = line.substring(last);
-          } else {
-            _unresolvedMessage = "";
-          }
-        }
-      }
-    } catch (e) {
-      print("Catastrophic failure during _extractJson: $e");
-    }
-
-    return r;
-  }
-
-  static final _rgx = RegExp(r"Content-Length: [0-9]+\nContent-Type: application/vscode.jsonrpc; charset=utf-8\n\n");
 }
