@@ -37,7 +37,19 @@ void main() {
         expect(false, isTrue);
         return;
       }
-      expect(true, isTrue);
+      expect(surface.serverInfo, isNotNull);
+      expect(surface.capabilities.callHierarchyProvider, isTrue);
+      expect(surface.capabilities.codeActionProvider, isTrue);
+      expect(surface.capabilities.definitionProvider, isTrue);
+      expect(surface.capabilities.documentHighlightProvider, isTrue);
+      expect(surface.capabilities.documentSymbolProvider, isTrue);
+      expect(surface.capabilities.foldingRangeProvider, isTrue);
+      expect(surface.capabilities.hoverProvider, isTrue);
+      expect(surface.capabilities.implementationProvider, isTrue);
+      expect(surface.capabilities.referenceProvider, isTrue);
+      expect(surface.capabilities.selectionRangeProvider, isTrue);
+      expect(surface.capabilities.typeHierarchyProvider, isTrue);
+      expect(surface.capabilities.workspaceSymbolProvider, isTrue);
       surface.dispose();
     });
 
@@ -77,8 +89,6 @@ void main() {
         "interpolation",
         "void"
       ]);
-      expect(surface.capabilities, isNotNull);
-      expect(surface.serverInfo, isNotNull);
       surface.dispose();
     });
 

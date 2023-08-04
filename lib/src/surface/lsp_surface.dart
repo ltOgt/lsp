@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:lsp/lsp.dart';
+import 'package:lsp/src/object/server_capabilities.dart';
 import 'package:lsp/src/object/server_info.dart';
 import 'dart:io';
 
@@ -37,7 +38,7 @@ class LspSurface {
   /// Needed to resolve eventual [SemanticToken]s, which contain only indexes to this legend.
   late final SemanticTokenLegend semanticTokenLegend;
 
-  late final Map? capabilities;
+  late final ServerCapabilities capabilities;
   late final ServerInfo? serverInfo;
 
   /// Root path for the project that should be analyzed
