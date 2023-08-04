@@ -23,4 +23,8 @@ void outerCall() {
   innerCall();
 }
 
-void innerCall() {}
+void innerCall() {
+  anotherCall();
+}
+
+void anotherCall() {}

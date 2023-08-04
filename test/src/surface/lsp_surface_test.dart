@@ -37,6 +37,18 @@ const kInnerCallPosition = TextDocumentPositionParams(
   ),
 );
 
+const _expectedHover = """```dart
+class TestClass extends BaseClass
+```
+*test/_test_data/semantic_token_source.dart*
+
+---
+This is the docstring for [TestClass]""";
+
+// =============================================================================
+// =============================================================================
+// =============================================================================
+
 Future<LspSurface> init() {
   final connector = LspConnectorDart(
     analysisServerPath: ANALYSIS_PATH,
@@ -55,6 +67,10 @@ void main() {
     if (!File(SEMANTIC_TEST_FILE_PATH).existsSync()) {
       throw "Test file does not exist";
     }
+
+    // =========================================================================
+    // =========================================================================
+    // =========================================================================
 
     test('Initiate Connection', () async {
       late LspSurface surface;
@@ -80,6 +96,10 @@ void main() {
       expect(surface.capabilities.typeDefinitionProvider, isFalse); // Not provided by dart server
       surface.dispose();
     });
+
+    // =========================================================================
+    // =========================================================================
+    // =========================================================================
 
     test('Semantic Token Legend', () async {
       final surface = await init();
@@ -120,13 +140,17 @@ void main() {
       surface.dispose();
     });
 
+    // =========================================================================
+    // =========================================================================
+    // =========================================================================
+
     test('Semantic Token Request + Decode', () async {
       final LspSurface surface = await init();
       SemanticTokenFullResponse r = await surface.textDocument_semanticTokens_full(
         filePath: SEMANTIC_TEST_FILE_PATH,
       );
       List<SemanticToken> tokens = SemanticTokenDecoder.decodeTokens(r.data);
-      expect(tokens.length, equals(41));
+      expect(tokens.length, equals(44));
 
       // "testField" declaration (line 8, col 16)
       final testFieldToken = tokens[17];
@@ -137,6 +161,10 @@ void main() {
 
       surface.dispose();
     });
+
+    // =========================================================================
+    // =========================================================================
+    // =========================================================================
 
     test('Find all references', () async {
       final LspSurface surface = await init();
@@ -195,6 +223,10 @@ void main() {
       );
     });
 
+    // =========================================================================
+    // =========================================================================
+    // =========================================================================
+
     test('Find all implementations', () async {
       final LspSurface surface = await init();
       LocationsResponse r = await surface.textDocument_implementation(
@@ -219,6 +251,10 @@ void main() {
       );
     });
 
+    // =========================================================================
+    // =========================================================================
+    // =========================================================================
+
     test('Hover', () async {
       final LspSurface surface = await init();
       HoverResponse r = await surface.textDocument_hover(
@@ -236,6 +272,10 @@ void main() {
         ),
       );
     });
+
+    // =========================================================================
+    // =========================================================================
+    // =========================================================================
 
     test('Document Highlight', () async {
       final LspSurface surface = await init();
@@ -308,6 +348,10 @@ void main() {
       );
     });
 
+    // =========================================================================
+    // =========================================================================
+    // =========================================================================
+
     test('Prepare Call hierarchy', () async {
       final LspSurface surface = await init();
       PrepareCallHierarchyResponse r = await surface.textDocument_prepareCallHierarchy(
@@ -325,14 +369,20 @@ void main() {
           detail: "semantic_token_source.dart",
           filePath: SEMANTIC_TEST_FILE_PATH,
           range: Range(
-            start: Position(line: 25, character: 0),
-            end: Position(
+            start: Position(
               line: 25,
-              character: 19,
+              character: 0,
+            ),
+            end: Position(
+              line: 27,
+              character: 1,
             ),
           ),
           selectionRange: Range(
-            start: Position(line: 25, character: 5),
+            start: Position(
+              line: 25,
+              character: 5,
+            ),
             end: Position(
               line: 25,
               character: 14,
@@ -344,11 +394,3 @@ void main() {
     });
   });
 }
-
-const _expectedHover = """```dart
-class TestClass extends BaseClass
-```
-*test/_test_data/semantic_token_source.dart*
-
----
-This is the docstring for [TestClass]""";
