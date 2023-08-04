@@ -185,11 +185,6 @@ class LspSurface {
 
   /// Request the location of all project-wide references of the symbol under the cursor.
   ///
-  /// [filePath] points to the source file.
-  /// [line] is a zero based offset for the line the cursor is in (first line ^= 0)
-  /// [character] is a zero based offset for the cursor inside the line (before first character ^= 0)
-  /// [includeDeclaration] toggles whether the declaration of the requested symbol should be included in the results.
-  ///
   /// https://microsoft.github.io/language-server-protocol/specification#textDocument_references
   /// https://microsoft.github.io/language-server-protocol/specification#textDocumentPositionParams
   Future<ReferenceResponse> textDocument_references(ReferenceParams params) async {
@@ -202,21 +197,14 @@ class LspSurface {
 
   /// Request the location of the implementation of a symbol at a given text document position.
   ///
-  /// [filePath] points to the source file.
-  /// [line] is a zero based offset for the line the cursor is in (first line ^= 0)
-  /// [character] is a zero based offset for the cursor inside the line (before first character ^= 0)
-  /// [includeDeclaration] toggles whether the declaration of the requested symbol should be included in the results.
-  ///
   /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_implementation
-  // Future<ReferenceResponse> textDocument_implementation(TextDocumentPositionParams params) async {
-  //   const _method = "textDocument/implementation";
-  //   if (!capabilities.implementationProvider) throw UnsupportedMethodException(_method);
+  Future<ReferenceResponse> textDocument_implementation(TextDocumentPositionParams params) async {
+    const _method = "textDocument/implementation";
+    if (!capabilities.implementationProvider) throw UnsupportedMethodException(_method);
 
-  //   throw UnimplementedError();
-
-  //   final res = await _requestCompleter.sendRequest(_method, referenceParams);
-  //   return ReferenceResponse(response: res);
-  // }
+    final res = await _requestCompleter.sendRequest(_method, params.json);
+    return ReferenceResponse(response: res);
+  }
 
   //"textDocument/implementation"
   //"textDocument/hover"

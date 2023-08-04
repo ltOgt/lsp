@@ -42,4 +42,7 @@ class Position {
 
   @override
   int get hashCode => line.hashCode ^ character.hashCode;
+
+  @override
+  String toString() => 'Position(line: $line, character: $character)';
 }

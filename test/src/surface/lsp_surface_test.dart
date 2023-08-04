@@ -99,10 +99,10 @@ void main() {
         filePath: SEMANTIC_TEST_FILE_PATH,
       );
       List<SemanticToken> tokens = SemanticTokenDecoder.decodeTokens(r.data);
-      expect(tokens.length, equals(23));
+      expect(tokens.length, equals(35));
 
-      // "testField" declaration
-      final testFieldToken = tokens[7];
+      // "testField" declaration (line 8, col 16)
+      final testFieldToken = tokens[17];
 
       expect(surface.semanticTokenLegend.tokenTypes[testFieldToken.tokenType], equals("property"));
       expect(surface.semanticTokenLegend.tokenModifiers[testFieldToken.tokenModifiers[0]], equals("declaration"));
@@ -117,8 +117,9 @@ void main() {
         ReferenceParams(
           position: TextDocumentPositionParams(
             textDocument: TextDocumentIdentifier(SEMANTIC_TEST_FILE_PATH),
+            // "TestClass" in "class TestClass extends BaseClass"
             position: Position(
-              line: 1,
+              line: 5,
               character: 10,
             ),
           ),
@@ -131,43 +132,46 @@ void main() {
 
       void _expectRanges(FileLocation actual, Position start, Position end) {
         expect(
-            actual,
-            equals(FileLocation(
+          actual,
+          equals(
+            FileLocation(
               filePath: SEMANTIC_TEST_FILE_PATH,
               range: Range(
                 // occurence in doc string
                 start: start,
                 end: end,
               ),
-            )));
+            ),
+          ),
+        );
       }
 
       // occurence in doc string
       _expectRanges(
         r.fileLocations[0],
-        Position(line: 0, character: 31),
-        Position(line: 0, character: 40),
+        Position(line: 4, character: 31),
+        Position(line: 4, character: 40),
       );
 
       // occurence in constructor
       _expectRanges(
         r.fileLocations[1],
-        Position(line: 5, character: 2),
-        Position(line: 5, character: 11),
+        Position(line: 10, character: 2),
+        Position(line: 10, character: 11),
       );
 
       // occurence in main() declaration
       _expectRanges(
         r.fileLocations[2],
-        Position(line: 11, character: 2),
-        Position(line: 11, character: 11),
+        Position(line: 16, character: 2),
+        Position(line: 16, character: 11),
       );
 
       // occurence in main() instantiation
       _expectRanges(
         r.fileLocations[3],
-        Position(line: 11, character: 24),
-        Position(line: 11, character: 33),
+        Position(line: 16, character: 24),
+        Position(line: 16, character: 33),
       );
     });
   });

@@ -48,4 +48,7 @@ class Range {
 
   @override
   int get hashCode => start.hashCode ^ end.hashCode;
+
+  @override
+  String toString() => 'Range(start: $start, end: $end)';
 }

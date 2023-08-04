@@ -41,4 +41,7 @@ class FileLocation {
 
   @override
   int get hashCode => range.hashCode ^ filePath.hashCode;
+
+  @override
+  String toString() => 'FileLocation(range: $range, filePath: $filePath)';
 }
