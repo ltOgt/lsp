@@ -5,6 +5,8 @@ import 'package:test/test.dart';
 
 import 'package:lsp/lsp.dart';
 
+// TODO add requests that result in empty list responses
+
 const String DART_SDK_PATH = "/Users/omni/development/flutter/bin/cache/dart-sdk/";
 const String ANALYSIS_PATH = DART_SDK_PATH + "bin/snapshots/analysis_server.dart.snapshot";
 const String ROOT_PATH = "/Users/omni/repos/package/lsp/";
@@ -27,10 +29,18 @@ const kBaseClassPosition = TextDocumentPositionParams(
   ),
 );
 
-Future<LspSurface> init(String clientId) {
+const kInnerCallPosition = TextDocumentPositionParams(
+  textDocument: TextDocumentIdentifier(SEMANTIC_TEST_FILE_PATH),
+  position: Position(
+    line: 25,
+    character: 10,
+  ),
+);
+
+Future<LspSurface> init() {
   final connector = LspConnectorDart(
     analysisServerPath: ANALYSIS_PATH,
-    clientId: clientId,
+    clientId: "clientId",
     clientVersion: "0.0.1",
   );
   return LspSurface.start(
@@ -49,7 +59,7 @@ void main() {
     test('Initiate Connection', () async {
       late LspSurface surface;
       try {
-        surface = await init("t1");
+        surface = await init();
       } on LspInitializationException catch (_) {
         expect(false, isTrue);
         return;
@@ -72,7 +82,7 @@ void main() {
     });
 
     test('Semantic Token Legend', () async {
-      final surface = await init("t2");
+      final surface = await init();
       expect(surface.semanticTokenLegend.tokenTypes, [
         "annotation",
         "keyword",
@@ -111,12 +121,12 @@ void main() {
     });
 
     test('Semantic Token Request + Decode', () async {
-      final LspSurface surface = await init("t3");
+      final LspSurface surface = await init();
       SemanticTokenFullResponse r = await surface.textDocument_semanticTokens_full(
         filePath: SEMANTIC_TEST_FILE_PATH,
       );
       List<SemanticToken> tokens = SemanticTokenDecoder.decodeTokens(r.data);
-      expect(tokens.length, equals(35));
+      expect(tokens.length, equals(41));
 
       // "testField" declaration (line 8, col 16)
       final testFieldToken = tokens[17];
@@ -129,7 +139,7 @@ void main() {
     });
 
     test('Find all references', () async {
-      final LspSurface surface = await init("t4");
+      final LspSurface surface = await init();
       LocationsResponse r = await surface.textDocument_references(
         ReferenceParams(
           position: kTestClassPosition,
@@ -186,7 +196,7 @@ void main() {
     });
 
     test('Find all implementations', () async {
-      final LspSurface surface = await init("t5");
+      final LspSurface surface = await init();
       LocationsResponse r = await surface.textDocument_implementation(
         kBaseClassPosition,
       );
@@ -210,7 +220,7 @@ void main() {
     });
 
     test('Hover', () async {
-      final LspSurface surface = await init("t6");
+      final LspSurface surface = await init();
       HoverResponse r = await surface.textDocument_hover(
         kTestClassPosition,
       );
@@ -228,7 +238,7 @@ void main() {
     });
 
     test('Document Highlight', () async {
-      final LspSurface surface = await init("t6");
+      final LspSurface surface = await init();
       DocumentHighlightResponse r = await surface.textDocument_documentHighlight(
         kTestClassPosition,
       );
@@ -241,7 +251,7 @@ void main() {
         DocumentHighlight actual,
         Position expectedStart,
         Position expectedEnd,
-        DocumentHighlightKind expectedKind,
+        DocumentHighlightKind? expectedKind,
       ) {
         expect(
           actual,
@@ -262,7 +272,7 @@ void main() {
         r.highlights[0],
         Position(line: 5, character: 6),
         Position(line: 5, character: 15),
-        DocumentHighlightKind.text,
+        null,
       );
 
       // occurence in doc string
@@ -270,7 +280,7 @@ void main() {
         r.highlights[1],
         Position(line: 4, character: 31),
         Position(line: 4, character: 40),
-        DocumentHighlightKind.text,
+        null,
       );
 
       // occurence in constructor
@@ -278,7 +288,7 @@ void main() {
         r.highlights[2],
         Position(line: 10, character: 2),
         Position(line: 10, character: 11),
-        DocumentHighlightKind.text,
+        null,
       );
 
       // occurence in main() declaration
@@ -286,7 +296,7 @@ void main() {
         r.highlights[3],
         Position(line: 16, character: 2),
         Position(line: 16, character: 11),
-        DocumentHighlightKind.text,
+        null,
       );
 
       // occurence in main() instantiation
@@ -294,7 +304,42 @@ void main() {
         r.highlights[4],
         Position(line: 16, character: 24),
         Position(line: 16, character: 33),
-        DocumentHighlightKind.text,
+        null,
+      );
+    });
+
+    test('Prepare Call hierarchy', () async {
+      final LspSurface surface = await init();
+      PrepareCallHierarchyResponse r = await surface.textDocument_prepareCallHierarchy(
+        kInnerCallPosition,
+      );
+      surface.dispose();
+
+      expect(r.items.length, 1);
+      expect(
+        r.items.first,
+        CallHierarchyItem(
+          name: "innerCall",
+          kind: SymbolKind.constant,
+          tags: null,
+          detail: "semantic_token_source.dart",
+          filePath: SEMANTIC_TEST_FILE_PATH,
+          range: Range(
+            start: Position(line: 25, character: 0),
+            end: Position(
+              line: 25,
+              character: 19,
+            ),
+          ),
+          selectionRange: Range(
+            start: Position(line: 25, character: 5),
+            end: Position(
+              line: 25,
+              character: 14,
+            ),
+          ),
+          data: null,
+        ),
       );
     });
   });

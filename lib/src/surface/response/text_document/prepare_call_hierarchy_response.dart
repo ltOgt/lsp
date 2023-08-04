@@ -1,0 +1,180 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:collection/collection.dart';
+
+import 'package:lsp/src/surface/param/range.dart';
+import 'package:lsp/src/surface/response/base_response.dart';
+
+/// The result of a "textDocument/prepareCallHierarchy" request.
+///
+/// See [CallHierarchyItem] for details.
+class PrepareCallHierarchyResponse extends BaseResponse {
+  late final List<CallHierarchyItem> items;
+
+  PrepareCallHierarchyResponse({
+    required LspResponse response,
+  }) : super(response: response) {
+    items = response.results?.map(CallHierarchyItem.fromJson).toList() ?? [];
+  }
+}
+
+/// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#callHierarchyItem
+class CallHierarchyItem {
+  /// The name of this item.
+  final String name;
+
+  /// The kind of this item.
+  final SymbolKind kind;
+
+  /// Tags for this item.
+  final List<SymbolTag>? tags;
+
+  /// More detail for this item, e.g. the signature of a function.
+  final String? detail;
+
+  /// The resource identifier of this item.
+  String get uri => _kUriPrefix + filePath;
+  final String filePath;
+
+  /// The range enclosing this symbol not including leading/trailing whitespace
+  /// but everything else, e.g. comments and code.
+  final Range range;
+
+  /// The range that should be selected and revealed when this symbol is being
+  /// picked, e.g. the name of a function. Must be contained by the
+  /// [`range`](#CallHierarchyItem.range).
+  final Range selectionRange;
+
+  /// A data entry field that is preserved between a call hierarchy prepare and
+  /// incoming calls or outgoing calls requests.
+  final dynamic data;
+
+  CallHierarchyItem({
+    required this.name,
+    required this.kind,
+    required this.tags,
+    required this.detail,
+    required this.filePath,
+    required this.range,
+    required this.selectionRange,
+    required this.data,
+  });
+
+  // ===========================================================================
+  static const _kUriPrefix = "file://";
+  static const _kName = "name";
+  static const _kKind = "kind";
+  static const _kTags = "tags";
+  static const _kDetail = "detail";
+  static const _kUri = "uri";
+  static const _kRange = "range";
+  static const _kSelectionRange = "selectionRange";
+  static const _kData = "data";
+
+  Map toJson() => json;
+  Map get json => {
+        _kName: name,
+        _kKind: kind.value,
+        if (tags != null) _kTags: tags!.map((e) => e.value),
+        if (detail != null) _kDetail: detail,
+        _kUri: uri,
+        _kRange: range.json,
+        _kSelectionRange: selectionRange.json,
+        _kData: data,
+      };
+
+  static CallHierarchyItem fromJson(Map map) => CallHierarchyItem(
+        name: map[_kName],
+        kind: SymbolKind.fromValue(map[_kKind] as int),
+        tags: _decodeTags(map),
+        detail: map[_kDetail],
+        filePath: (map[_kUri] as String).split(_kUriPrefix).last,
+        range: Range.fromJson(map[_kRange] as Map<String, dynamic>),
+        selectionRange: Range.fromJson(map[_kSelectionRange] as Map<String, dynamic>),
+        data: map[_kData],
+      );
+
+  static List<SymbolTag>? _decodeTags(Map map) {
+    final list = map[_kTags] as List?;
+    if (list == null) return null;
+    return list.cast<int>().map(SymbolTag.fromValue).toList();
+  }
+
+  // ===========================================================================
+
+  @override
+  bool operator ==(covariant CallHierarchyItem other) {
+    if (identical(this, other)) return true;
+    final listEquals = const DeepCollectionEquality().equals;
+
+    return other.name == name &&
+        other.kind == kind &&
+        listEquals(other.tags, tags) &&
+        other.detail == detail &&
+        other.filePath == filePath &&
+        other.range == range &&
+        other.selectionRange == selectionRange &&
+        other.data == data;
+  }
+
+  @override
+  int get hashCode {
+    final listHash = const DeepCollectionEquality().hash;
+
+    return name.hashCode ^
+        kind.hashCode ^
+        listHash(tags) ^
+        detail.hashCode ^
+        filePath.hashCode ^
+        range.hashCode ^
+        selectionRange.hashCode ^
+        data.hashCode;
+  }
+
+  @override
+  String toString() {
+    return 'CallHierarchyItem(name: $name, kind: $kind, tags: $tags, detail: $detail, filePath: $filePath, range: $range, selectionRange: $selectionRange, data: $data)';
+  }
+}
+
+enum SymbolKind {
+  file(1),
+  module(2),
+  namespace(3),
+  package(4),
+  class_(5),
+  method(6),
+  property(7),
+  field(8),
+  constructor(9),
+  enum_(10),
+  interface(11),
+  function(12),
+  variable(13),
+  constant(14),
+  string(15),
+  number(16),
+  boolean(17),
+  array(18),
+  object(19),
+  key(20),
+  null_(21),
+  enumMember(22),
+  struct(23),
+  event(24),
+  operator(25),
+  typeParameter(26);
+
+  const SymbolKind(this.value);
+  final int value;
+
+  static SymbolKind fromValue(int value) => SymbolKind.values[value + 1];
+}
+
+enum SymbolTag {
+  deprecated(1);
+
+  const SymbolTag(this.value);
+  final int value;
+
+  static SymbolTag fromValue(int value) => SymbolTag.values[value + 1];
+}

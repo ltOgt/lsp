@@ -14,6 +14,7 @@ export 'src/surface/response/text_document/semantic_full_response.dart';
 export 'src/surface/response/text_document/locations_response.dart';
 export 'src/surface/response/text_document/hover_response.dart';
 export 'src/surface/response/text_document/document_highlight_response.dart';
+export 'src/surface/response/text_document/prepare_call_hierarchy_response.dart';
 
 // =============================================================================
 // For extracting semantic tokens and modifiers

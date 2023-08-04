@@ -8,7 +8,7 @@ class FileLocation {
   final Range range;
 
   final String filePath;
-  String get uri => "file://" + filePath;
+  String get uri => _kUriPrefix + filePath;
 
   FileLocation({
     required this.range,

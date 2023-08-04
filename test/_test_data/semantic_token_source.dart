@@ -16,4 +16,11 @@ class TestClass extends BaseClass {
 void main(List<String> args) {
   TestClass testClass = TestClass(testField: "testField");
   print(testClass);
+  outerCall();
 }
+
+void outerCall() {
+  innerCall();
+}
+
+void innerCall() {}

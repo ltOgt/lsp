@@ -25,6 +25,6 @@ class LocationsResponse extends BaseResponse {
   LocationsResponse({
     required LspResponse response,
   }) : super(response: response) {
-    fileLocations = (response.results!).map(FileLocation.fromJson).toList();
+    fileLocations = response.results?.map(FileLocation.fromJson).toList() ?? [];
   }
 }

@@ -11,7 +11,7 @@ class DocumentHighlightResponse extends BaseResponse {
   DocumentHighlightResponse({
     required LspResponse response,
   }) : super(response: response) {
-    highlights = response.results!.map(DocumentHighlight.fromJson).toList();
+    highlights = response.results?.map(DocumentHighlight.fromJson).toList() ?? [];
   }
 }
 
@@ -26,13 +26,13 @@ class DocumentHighlight {
   /// The range this highlight applies to.
   final Range range;
 
-  /// The highlight kind, default is [DocumentHighlightKind.text].
-  final DocumentHighlightKind kind;
+  /// The highlight kind.
+  final DocumentHighlightKind? kind;
 
   DocumentHighlight({
     required this.range,
-    required DocumentHighlightKind? kind,
-  }) : kind = kind ?? DocumentHighlightKind.text;
+    required this.kind,
+  });
 
   // ===========================================================================
   static const _kRange = "range";
@@ -41,7 +41,7 @@ class DocumentHighlight {
   Map toJson() => json;
   Map get json => {
         _kRange: range.json,
-        _kKind: kind.value,
+        _kKind: kind?.value ?? DocumentHighlightKind.text,
       };
 
   static DocumentHighlight fromJson(Map map) => DocumentHighlight(
@@ -80,5 +80,5 @@ enum DocumentHighlightKind {
 
   static DocumentHighlightKind? fromValueOrNull(int? value) => value == null //
       ? null
-      : DocumentHighlightKind.values[value];
+      : DocumentHighlightKind.values[value + 1];
 }

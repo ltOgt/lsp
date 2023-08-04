@@ -235,7 +235,23 @@ class LspSurface {
     return DocumentHighlightResponse(response: res);
   }
 
-  //"textDocument/prepareCallHierarchy"
+  /// Request a call hierarchy for the language element of given text document positions.
+  ///
+  /// This is the first step, which resolves a hierarchy item
+  ///
+  /// Follow up with
+  /// - [callHierarchy_incomingCalls]
+  /// - [callHierarchy_outgoingCalls]
+  ///
+  /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_prepareCallHierarchy
+  Future<PrepareCallHierarchyResponse> textDocument_prepareCallHierarchy(TextDocumentPositionParams params) async {
+    const _method = "textDocument/prepareCallHierarchy";
+    if (!capabilities.callHierarchyProvider) throw UnsupportedMethodException(_method);
+
+    final res = await _requestCompleter.sendRequest(_method, params.json);
+    return PrepareCallHierarchyResponse(response: res);
+  }
+
   //"callHierarchy/incomingCalls"
   //"callHierarchy/outgoingCalls"
 
