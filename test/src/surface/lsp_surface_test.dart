@@ -10,6 +10,23 @@ const String ANALYSIS_PATH = DART_SDK_PATH + "bin/snapshots/analysis_server.dart
 const String ROOT_PATH = "/Users/omni/repos/package/lsp/";
 const String SEMANTIC_TEST_FILE_PATH = ROOT_PATH + "test/_test_data/semantic_token_source.dart";
 
+const kTestClassPosition = TextDocumentPositionParams(
+  textDocument: TextDocumentIdentifier(SEMANTIC_TEST_FILE_PATH),
+  // "TestClass" in "class TestClass extends BaseClass"
+  position: Position(
+    line: 5,
+    character: 10,
+  ),
+);
+const kBaseClassPosition = TextDocumentPositionParams(
+  textDocument: TextDocumentIdentifier(SEMANTIC_TEST_FILE_PATH),
+  // "TestClass" in "class TestClass extends BaseClass"
+  position: Position(
+    line: 0,
+    character: 19,
+  ),
+);
+
 Future<LspSurface> init(String clientId) {
   final connector = LspConnectorDart(
     analysisServerPath: ANALYSIS_PATH,
@@ -113,16 +130,9 @@ void main() {
 
     test('Find all references', () async {
       final LspSurface surface = await init("t4");
-      ReferenceResponse r = await surface.textDocument_references(
+      LocationsResponse r = await surface.textDocument_references(
         ReferenceParams(
-          position: TextDocumentPositionParams(
-            textDocument: TextDocumentIdentifier(SEMANTIC_TEST_FILE_PATH),
-            // "TestClass" in "class TestClass extends BaseClass"
-            position: Position(
-              line: 5,
-              character: 10,
-            ),
-          ),
+          position: kTestClassPosition,
           includeDeclaration: false,
         ),
       );
@@ -172,6 +182,30 @@ void main() {
         r.fileLocations[3],
         Position(line: 16, character: 24),
         Position(line: 16, character: 33),
+      );
+    });
+
+    test('Find all implementations', () async {
+      final LspSurface surface = await init("t5");
+      LocationsResponse r = await surface.textDocument_implementation(
+        kBaseClassPosition,
+      );
+
+      surface.dispose();
+      expect(r.fileLocations.length, equals(1));
+
+      expect(
+        r.fileLocations.first,
+        equals(
+          /// "TestClass" in "class TestClass extends BaseClass"
+          FileLocation(
+            filePath: SEMANTIC_TEST_FILE_PATH,
+            range: Range(
+              start: Position(line: 5, character: 6),
+              end: Position(line: 5, character: 15),
+            ),
+          ),
+        ),
       );
     });
   });

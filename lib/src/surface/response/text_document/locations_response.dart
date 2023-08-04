@@ -19,16 +19,12 @@ import 'package:lsp/src/surface/response/base_response.dart';
 ///   ...
 /// ]
 /// ```
-class DefinitionResponse extends BaseResponse {
+class LocationsResponse extends BaseResponse {
   late final List<FileLocation> fileLocations;
 
-  DefinitionResponse({
+  LocationsResponse({
     required LspResponse response,
   }) : super(response: response) {
-    fileLocations = (response.results!).map(
-      (Map location) {
-        return FileLocation.fromJson(location);
-      },
-    ).toList();
+    fileLocations = (response.results!).map(FileLocation.fromJson).toList();
   }
 }

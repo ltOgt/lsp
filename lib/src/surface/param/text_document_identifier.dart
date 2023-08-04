@@ -6,7 +6,7 @@
 class TextDocumentIdentifier {
   final String filePath;
 
-  TextDocumentIdentifier(this.filePath);
+  const TextDocumentIdentifier(this.filePath);
 
   // ===========================================================================
 

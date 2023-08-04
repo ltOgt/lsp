@@ -11,7 +11,7 @@ class Position {
   /// The meaning of this offset is determined by the negotiated `PositionEncodingKind`.
   final int character;
 
-  Position({
+  const Position({
     required this.line,
     required this.character,
   });

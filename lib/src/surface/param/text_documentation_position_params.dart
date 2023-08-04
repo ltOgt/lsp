@@ -9,7 +9,7 @@ class TextDocumentPositionParams {
 
   final Position position;
 
-  TextDocumentPositionParams({
+  const TextDocumentPositionParams({
     required this.textDocument,
     required this.position,
   });

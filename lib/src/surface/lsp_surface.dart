@@ -175,35 +175,35 @@ class LspSurface {
   ///
   /// https://microsoft.github.io/language-server-protocol/specification#textDocument_definition
   /// https://microsoft.github.io/language-server-protocol/specification#textDocumentPositionParams
-  Future<DefinitionResponse> textDocument_definition(TextDocumentPositionParams params) async {
+  Future<LocationsResponse> textDocument_definition(TextDocumentPositionParams params) async {
     const _method = "textDocument/definition";
     if (!capabilities.definitionProvider) throw UnsupportedMethodException(_method);
 
     final res = await _requestCompleter.sendRequest(_method, params.json);
-    return DefinitionResponse(response: res);
+    return LocationsResponse(response: res);
   }
 
   /// Request the location of all project-wide references of the symbol under the cursor.
   ///
   /// https://microsoft.github.io/language-server-protocol/specification#textDocument_references
   /// https://microsoft.github.io/language-server-protocol/specification#textDocumentPositionParams
-  Future<ReferenceResponse> textDocument_references(ReferenceParams params) async {
+  Future<LocationsResponse> textDocument_references(ReferenceParams params) async {
     const _method = "textDocument/references";
     if (!capabilities.definitionProvider) throw UnsupportedMethodException(_method);
 
     final res = await _requestCompleter.sendRequest(_method, params.json);
-    return ReferenceResponse(response: res);
+    return LocationsResponse(response: res);
   }
 
   /// Request the location of the implementation of a symbol at a given text document position.
   ///
   /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_implementation
-  Future<ReferenceResponse> textDocument_implementation(TextDocumentPositionParams params) async {
+  Future<LocationsResponse> textDocument_implementation(TextDocumentPositionParams params) async {
     const _method = "textDocument/implementation";
     if (!capabilities.implementationProvider) throw UnsupportedMethodException(_method);
 
     final res = await _requestCompleter.sendRequest(_method, params.json);
-    return ReferenceResponse(response: res);
+    return LocationsResponse(response: res);
   }
 
   //"textDocument/implementation"
