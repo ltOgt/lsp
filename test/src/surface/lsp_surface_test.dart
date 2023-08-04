@@ -77,6 +77,8 @@ void main() {
         "interpolation",
         "void"
       ]);
+      expect(surface.capabilities, isNotNull);
+      expect(surface.serverInfo, isNotNull);
       surface.dispose();
     });
 

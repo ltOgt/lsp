@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:lsp/lsp.dart';
+import 'package:lsp/src/object/server_info.dart';
 import 'dart:io';
 
 import 'package:lsp/src/surface/response/base_response.dart';
@@ -35,6 +36,9 @@ class LspSurface {
   /// Legend provided during lsp initialization.
   /// Needed to resolve eventual [SemanticToken]s, which contain only indexes to this legend.
   late final SemanticTokenLegend semanticTokenLegend;
+
+  late final Map? capabilities;
+  late final ServerInfo? serverInfo;
 
   /// Root path for the project that should be analyzed
   //. Not really needed after [start], but can be exposed to consumers
@@ -93,7 +97,9 @@ class LspSurface {
       throw LspInitializationException();
     }
 
-    // Store semantic token infos
+    // Store server info
+    lsm.capabilities = r1.capabilities;
+    lsm.serverInfo = r1.serverInfo;
     lsm.semanticTokenLegend = SemanticTokenLegend(
       tokenTypes: r1.semanticTokenTypes,
       tokenModifiers: r1.semanticTokenModifiers,
