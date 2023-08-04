@@ -21,6 +21,7 @@ import 'package:lsp/src/surface/response/base_response.dart';
 ///   ...
 /// ]
 /// ```
+@Deprecated("")
 class DefinitionResponse extends BaseResponse {
   late final List<FileLocation> fileLocations;
 

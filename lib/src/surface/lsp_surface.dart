@@ -7,9 +7,12 @@ import 'dart:typed_data';
 import 'package:lsp/lsp.dart';
 import 'package:lsp/src/object/server_capabilities.dart';
 import 'package:lsp/src/object/server_info.dart';
+import 'package:lsp/src/surface/param/reference_params.dart';
+import 'package:lsp/src/surface/param/text_documentation_position_params.dart';
 import 'dart:io';
 
 import 'package:lsp/src/surface/response/base_response.dart';
+import 'package:lsp/src/surface/unsupported_method_exception.dart';
 import 'package:lsp/src/surface/wireformat.dart';
 
 /// ID to match request to respnse.
@@ -170,30 +173,13 @@ class LspSurface {
 
   /// Request the location of the definition of the symbol under the cursor.
   ///
-  /// [filePath] points to the source file.
-  /// [line] is a zero based offset for the line the cursor is in (first line ^= 0)
-  /// [character] is a zero based offset for the cursor inside the line (before first character ^= 0)
-  ///
   /// https://microsoft.github.io/language-server-protocol/specification#textDocument_definition
   /// https://microsoft.github.io/language-server-protocol/specification#textDocumentPositionParams
-  Future<DefinitionResponse> textDocument_definition({
-    required String filePath,
-    required int line,
-    required int character,
-  }) async {
-    var position = {
-      "line": line,
-      "character": character,
-    };
-    var textDocumentIdentifier = {
-      "uri": "file://" + filePath,
-    };
-    var textDocumentPositionParams = {
-      "textDocument": textDocumentIdentifier,
-      "position": position,
-    };
+  Future<DefinitionResponse> textDocument_definition(TextDocumentPositionParams params) async {
+    const _method = "textDocument/definition";
+    if (!capabilities.definitionProvider) throw UnsupportedMethodException(_method);
 
-    final res = await _requestCompleter.sendRequest("textDocument/definition", textDocumentPositionParams);
+    final res = await _requestCompleter.sendRequest(_method, params.json);
     return DefinitionResponse(response: res);
   }
 
@@ -206,31 +192,43 @@ class LspSurface {
   ///
   /// https://microsoft.github.io/language-server-protocol/specification#textDocument_references
   /// https://microsoft.github.io/language-server-protocol/specification#textDocumentPositionParams
-  Future<ReferenceResponse> textDocument_references({
-    required String filePath,
-    required int line,
-    required int character,
-    required bool includeDeclaration,
-  }) async {
-    var position = {
-      "line": line,
-      "character": character,
-    };
-    var textDocumentIdentifier = {
-      "uri": "file://" + filePath,
-    };
-    var referenceContext = {
-      "includeDeclaration": includeDeclaration,
-    };
-    var referenceParams = {
-      "textDocument": textDocumentIdentifier,
-      "position": position,
-      "context": referenceContext,
-    };
+  Future<ReferenceResponse> textDocument_references(ReferenceParams params) async {
+    const _method = "textDocument/references";
+    if (!capabilities.definitionProvider) throw UnsupportedMethodException(_method);
 
-    final res = await _requestCompleter.sendRequest("textDocument/references", referenceParams);
+    final res = await _requestCompleter.sendRequest(_method, params.json);
     return ReferenceResponse(response: res);
   }
+
+  /// Request the location of the implementation of a symbol at a given text document position.
+  ///
+  /// [filePath] points to the source file.
+  /// [line] is a zero based offset for the line the cursor is in (first line ^= 0)
+  /// [character] is a zero based offset for the cursor inside the line (before first character ^= 0)
+  /// [includeDeclaration] toggles whether the declaration of the requested symbol should be included in the results.
+  ///
+  /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_implementation
+  Future<ReferenceResponse> textDocument_implementation(TextDocumentPositionParams params) async {
+    const _method = "textDocument/implementation";
+    if (!capabilities.implementationProvider) throw UnsupportedMethodException(_method);
+
+    throw UnimplementedError();
+
+    final res = await _requestCompleter.sendRequest(_method, referenceParams);
+    return ReferenceResponse(response: res);
+  }
+
+  //"textDocument/implementation"
+  //"textDocument/hover"
+  //"textDocument/prepareCallHierarchy"
+  //"callHierarchy/incomingCalls"
+  //"callHierarchy/outgoingCalls"
+  //"textDocument/typeHierarchy"
+  //"typeHierarchy/supertypes"
+  //"typeHierarchy/subtypes"
+  //"textDocument/documentHighlight"
+  //"textDocument/documentLink"
+  //"documentLink/resolve"
 }
 
 // =============================================================================

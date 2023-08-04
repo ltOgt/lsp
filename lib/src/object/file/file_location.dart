@@ -5,6 +5,7 @@ import 'file_range.dart';
 ///
 /// Used by
 /// -
+@Deprecated("")
 class FileLocation {
   static const String key_path = "path";
   final String path;

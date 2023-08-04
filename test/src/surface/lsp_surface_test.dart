@@ -50,6 +50,7 @@ void main() {
       expect(surface.capabilities.selectionRangeProvider, isTrue);
       expect(surface.capabilities.typeHierarchyProvider, isTrue);
       expect(surface.capabilities.workspaceSymbolProvider, isTrue);
+      expect(surface.capabilities.typeDefinitionProvider, isFalse); // Not provided by dart server
       surface.dispose();
     });
 

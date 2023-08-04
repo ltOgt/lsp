@@ -15,6 +15,7 @@ class ServerCapabilities {
   late final Map semanticTokensProvider = capabilities["semanticTokensProvider"] ?? false;
   late final bool typeHierarchyProvider = capabilities["typeHierarchyProvider"] ?? false;
   late final bool workspaceSymbolProvider = capabilities["workspaceSymbolProvider"] ?? false;
+  late final bool typeDefinitionProvider = capabilities["typeDefinitionProvider"] ?? false;
 
   ServerCapabilities.fromJson(this.capabilities);
 }

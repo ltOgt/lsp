@@ -18,6 +18,7 @@ import 'file_position.dart';
 ///   }
 /// }
 /// ```
+@Deprecated("Potentially deprecated")
 class FileRange {
   static const String key_start = "start";
   final FilePosition start;
