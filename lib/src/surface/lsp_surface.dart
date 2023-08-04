@@ -196,6 +196,8 @@ class LspSurface {
     const _method = "textDocument/references";
     if (!capabilities.definitionProvider) throw UnsupportedMethodException(_method);
 
+    final paramsjson = params.json;
+    print(paramsjson);
     final res = await _requestCompleter.sendRequest(_method, params.json);
     return ReferenceResponse(response: res);
   }
@@ -208,15 +210,15 @@ class LspSurface {
   /// [includeDeclaration] toggles whether the declaration of the requested symbol should be included in the results.
   ///
   /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_implementation
-  Future<ReferenceResponse> textDocument_implementation(TextDocumentPositionParams params) async {
-    const _method = "textDocument/implementation";
-    if (!capabilities.implementationProvider) throw UnsupportedMethodException(_method);
+  // Future<ReferenceResponse> textDocument_implementation(TextDocumentPositionParams params) async {
+  //   const _method = "textDocument/implementation";
+  //   if (!capabilities.implementationProvider) throw UnsupportedMethodException(_method);
 
-    throw UnimplementedError();
+  //   throw UnimplementedError();
 
-    final res = await _requestCompleter.sendRequest(_method, referenceParams);
-    return ReferenceResponse(response: res);
-  }
+  //   final res = await _requestCompleter.sendRequest(_method, referenceParams);
+  //   return ReferenceResponse(response: res);
+  // }
 
   //"textDocument/implementation"
   //"textDocument/hover"

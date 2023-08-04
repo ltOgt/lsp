@@ -6,14 +6,14 @@ import 'file_range.dart';
 /// Used by
 /// -
 @Deprecated("")
-class FileLocation {
+class FileLocationOld {
   static const String key_path = "path";
   final String path;
 
   static const String key_range = "range";
-  final FileRange range;
+  final FileRangeOld range;
 
-  FileLocation({
+  FileLocationOld({
     required this.path,
     required this.range,
   });
@@ -23,16 +23,16 @@ class FileLocation {
         key_range: range.encode(),
       };
 
-  static FileLocation decode(Map<String, Object> m) => FileLocation(
+  static FileLocationOld decode(Map<String, Object> m) => FileLocationOld(
         path: m[key_path]! as String,
-        range: FileRange.decode(m[key_range]! as Map<String, Object>),
+        range: FileRangeOld.decode(m[key_range]! as Map<String, Object>),
       );
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is FileLocation && other.path == path && other.range == range;
+    return other is FileLocationOld && other.path == path && other.range == range;
   }
 
   @override

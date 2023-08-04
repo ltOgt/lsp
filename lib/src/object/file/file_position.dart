@@ -7,14 +7,14 @@
 ///
 /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#position
 @Deprecated("Potentially deprecated")
-class FilePosition {
+class FilePositionOld {
   static const String _kLine = "line";
   final int line;
 
   static const String _kCharacter = "character";
   final int character;
 
-  FilePosition({
+  FilePositionOld({
     required this.line,
     required this.character,
   });
@@ -24,7 +24,7 @@ class FilePosition {
         _kCharacter: "$character",
       };
 
-  static FilePosition decode(Map<String, Object> m) => FilePosition(
+  static FilePositionOld decode(Map<String, Object> m) => FilePositionOld(
         line: int.parse(m[_kLine]! as String),
         character: int.parse(m[_kCharacter]! as String),
       );
@@ -33,7 +33,7 @@ class FilePosition {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is FilePosition && other.line == line && other.character == character;
+    return other is FilePositionOld && other.line == line && other.character == character;
   }
 
   @override

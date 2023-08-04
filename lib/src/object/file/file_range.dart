@@ -18,15 +18,15 @@ import 'file_position.dart';
 ///   }
 /// }
 /// ```
-@Deprecated("Potentially deprecated")
-class FileRange {
+@Deprecated("Deprecated, use Range instead")
+class FileRangeOld {
   static const String key_start = "start";
-  final FilePosition start;
+  final FilePositionOld start;
 
   static const String key_end = "end";
-  final FilePosition end;
+  final FilePositionOld end;
 
-  FileRange({
+  FileRangeOld({
     required this.start,
     required this.end,
   });
@@ -36,16 +36,16 @@ class FileRange {
         key_end: end.encode(),
       };
 
-  static FileRange decode(Map<String, Object> m) => FileRange(
-        start: FilePosition.decode(m[key_start]! as Map<String, Object>),
-        end: FilePosition.decode(m[key_end]! as Map<String, Object>),
+  static FileRangeOld decode(Map<String, Object> m) => FileRangeOld(
+        start: FilePositionOld.decode(m[key_start]! as Map<String, Object>),
+        end: FilePositionOld.decode(m[key_end]! as Map<String, Object>),
       );
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is FileRange && other.start == start && other.end == end;
+    return other is FileRangeOld && other.start == start && other.end == end;
   }
 
   @override

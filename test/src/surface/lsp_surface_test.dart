@@ -114,20 +114,27 @@ void main() {
     test('Find all references', () async {
       final LspSurface surface = await init("t4");
       ReferenceResponse r = await surface.textDocument_references(
-        filePath: SEMANTIC_TEST_FILE_PATH,
-        line: 1,
-        character: 10, // points at "TestClass"
-        includeDeclaration: false,
+        ReferenceParams(
+          position: TextDocumentPositionParams(
+            textDocument: TextDocumentIdentifier(SEMANTIC_TEST_FILE_PATH),
+            position: Position(
+              line: 1,
+              character: 10,
+            ),
+          ),
+          includeDeclaration: false,
+        ),
       );
+
       surface.dispose();
       expect(r.fileLocations.length, equals(4));
 
-      void _expectRanges(FileLocation actual, FilePosition start, FilePosition end) {
+      void _expectRanges(FileLocation actual, Position start, Position end) {
         expect(
             actual,
             equals(FileLocation(
-              path: SEMANTIC_TEST_FILE_PATH,
-              range: FileRange(
+              filePath: SEMANTIC_TEST_FILE_PATH,
+              range: Range(
                 // occurence in doc string
                 start: start,
                 end: end,
@@ -138,29 +145,29 @@ void main() {
       // occurence in doc string
       _expectRanges(
         r.fileLocations[0],
-        FilePosition(line: 0, character: 31),
-        FilePosition(line: 0, character: 40),
+        Position(line: 0, character: 31),
+        Position(line: 0, character: 40),
       );
 
       // occurence in constructor
       _expectRanges(
         r.fileLocations[1],
-        FilePosition(line: 5, character: 2),
-        FilePosition(line: 5, character: 11),
+        Position(line: 5, character: 2),
+        Position(line: 5, character: 11),
       );
 
       // occurence in main() declaration
       _expectRanges(
         r.fileLocations[2],
-        FilePosition(line: 11, character: 2),
-        FilePosition(line: 11, character: 11),
+        Position(line: 11, character: 2),
+        Position(line: 11, character: 11),
       );
 
       // occurence in main() instantiation
       _expectRanges(
         r.fileLocations[3],
-        FilePosition(line: 11, character: 24),
-        FilePosition(line: 11, character: 33),
+        Position(line: 11, character: 24),
+        Position(line: 11, character: 33),
       );
     });
   });
