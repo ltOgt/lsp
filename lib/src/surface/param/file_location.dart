@@ -20,6 +20,7 @@ class FileLocation {
   static const _kUriPrefix = "file://";
   static const _kRange = "range";
 
+  Map toJson() => json;
   Map get json => {
         _kUri: uri,
         _kRange: range.json,

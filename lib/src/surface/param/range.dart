@@ -27,6 +27,7 @@ class Range {
   static const _kStart = "start";
   static const _kEnd = "end";
 
+  Map toJson() => json;
   Map get json => {
         _kStart: start.json,
         _kEnd: end.json,

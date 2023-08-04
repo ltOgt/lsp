@@ -21,6 +21,7 @@ class Position {
   static const _kLine = "line";
   static const _kCharacter = "character";
 
+  Map toJson() => json;
   Map get json => {
         _kLine: line,
         _kCharacter: character,

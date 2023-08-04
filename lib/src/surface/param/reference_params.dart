@@ -13,6 +13,7 @@ class ReferenceParams {
 
   // ===========================================================================
 
+  Map toJson() => json;
   Map get json => {
         ...position.json,
         "context": {

@@ -18,6 +18,7 @@ class TextDocumentPositionParams {
   static const _kTextDocument = "textDocument";
   static const _kPosition = "position";
 
+  Map toJson() => json;
   Map get json => {
         _kTextDocument: textDocument.json,
         _kPosition: position.json,

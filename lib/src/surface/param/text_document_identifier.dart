@@ -14,6 +14,7 @@ class TextDocumentIdentifier {
   static const kUriPrefix = "file://";
 
   String get uri => "file://" + filePath;
+  Map toJson() => json;
   Map get json => {
         _kUri: uri,
       };
