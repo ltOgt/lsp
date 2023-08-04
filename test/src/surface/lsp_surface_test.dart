@@ -1,6 +1,7 @@
 // ignore_for_file: constant_identifier_names
 import 'dart:io';
 
+import 'package:lsp/src/surface/response/text_document/incoming_call_response.dart';
 import 'package:test/test.dart';
 
 import 'package:lsp/lsp.dart';
@@ -352,45 +353,92 @@ void main() {
     // =========================================================================
     // =========================================================================
 
-    test('Prepare Call hierarchy', () async {
-      final LspSurface surface = await init();
-      PrepareCallHierarchyResponse r = await surface.textDocument_prepareCallHierarchy(
-        kInnerCallPosition,
-      );
-      surface.dispose();
+    group("Call Hierarchy", () {
+      test('Prepare Call hierarchy', () async {
+        final LspSurface surface = await init();
+        PrepareCallHierarchyResponse r = await surface.textDocument_prepareCallHierarchy(
+          kInnerCallPosition,
+        );
+        surface.dispose();
 
-      expect(r.items.length, 1);
-      expect(
-        r.items.first,
-        CallHierarchyItem(
-          name: "innerCall",
-          kind: SymbolKind.constant,
-          tags: null,
-          detail: "semantic_token_source.dart",
-          filePath: SEMANTIC_TEST_FILE_PATH,
-          range: Range(
-            start: Position(
-              line: 25,
-              character: 0,
+        expect(r.items.length, 1);
+        expect(
+          r.items.first,
+          CallHierarchyItem(
+            name: "innerCall",
+            kind: SymbolKind.constant,
+            tags: null,
+            detail: "semantic_token_source.dart",
+            filePath: SEMANTIC_TEST_FILE_PATH,
+            range: Range(
+              start: Position(
+                line: 25,
+                character: 0,
+              ),
+              end: Position(
+                line: 27,
+                character: 1,
+              ),
             ),
-            end: Position(
-              line: 27,
-              character: 1,
+            selectionRange: Range(
+              start: Position(
+                line: 25,
+                character: 5,
+              ),
+              end: Position(
+                line: 25,
+                character: 14,
+              ),
             ),
+            data: null,
           ),
-          selectionRange: Range(
-            start: Position(
-              line: 25,
-              character: 5,
+        );
+      });
+
+      test('Resolve Incomming Calls', () async {
+        final LspSurface surface = await init();
+        PrepareCallHierarchyResponse r = await surface.textDocument_prepareCallHierarchy(
+          kInnerCallPosition,
+        );
+        expect(r.items.length, 1);
+        final item = r.items.first;
+
+        IncomingCallResponse r2 = await surface.callHierarchy_incomingCalls(
+          item,
+        );
+        surface.dispose();
+
+        // outer call
+        expect(r2.calls.length, 1);
+        expect(
+          r2.calls.first.from,
+          CallHierarchyItem(
+            name: "outerCall",
+            kind: SymbolKind.constant,
+            tags: null,
+            detail: "semantic_token_source.dart",
+            filePath: SEMANTIC_TEST_FILE_PATH,
+            range: Range(
+              start: Position(line: 21, character: 0),
+              end: Position(line: 23, character: 1),
             ),
-            end: Position(
-              line: 25,
-              character: 14,
+            selectionRange: Range(
+              start: Position(line: 21, character: 5),
+              end: Position(line: 21, character: 14),
             ),
+            data: null,
           ),
-          data: null,
-        ),
-      );
+        );
+        expect(r2.calls.first.fromRanges, isNotEmpty);
+        expect(r2.calls.first.fromRanges.length, 1);
+        expect(
+          r2.calls.first.fromRanges.first,
+          Range(
+            start: Position(line: 22, character: 2),
+            end: Position(line: 22, character: 11),
+          ),
+        );
+      });
     });
   });
 }

@@ -13,6 +13,7 @@ import 'dart:io';
 
 import 'package:lsp/src/surface/response/base_response.dart';
 import 'package:lsp/src/surface/response/text_document/document_highlight_response.dart';
+import 'package:lsp/src/surface/response/text_document/incoming_call_response.dart';
 import 'package:lsp/src/surface/unsupported_method_exception.dart';
 import 'package:lsp/src/surface/wireformat.dart';
 
@@ -250,6 +251,24 @@ class LspSurface {
 
     final res = await _requestCompleter.sendRequest(_method, params.json);
     return PrepareCallHierarchyResponse(response: res);
+  }
+
+  /// Request to resolve incoming calls for a given call hierarchy item.
+  ///
+  /// This is the second step, i.e. follow up for
+  /// - [textDocument_prepareCallHierarchy]
+  ///
+  /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#callHierarchy_incomingCalls
+  Future<IncomingCallResponse> callHierarchy_incomingCalls(CallHierarchyItem item) async {
+    const _method = "callHierarchy/incomingCalls";
+    if (!capabilities.callHierarchyProvider) throw UnsupportedMethodException(_method);
+
+    final params = {
+      "item": item.json,
+    };
+
+    final res = await _requestCompleter.sendRequest(_method, params);
+    return IncomingCallResponse(response: res);
   }
 
   //"callHierarchy/incomingCalls"
