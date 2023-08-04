@@ -12,6 +12,7 @@ import 'package:lsp/src/surface/param/text_documentation_position_params.dart';
 import 'dart:io';
 
 import 'package:lsp/src/surface/response/base_response.dart';
+import 'package:lsp/src/surface/response/text_document/document_highlight_response.dart';
 import 'package:lsp/src/surface/unsupported_method_exception.dart';
 import 'package:lsp/src/surface/wireformat.dart';
 
@@ -189,7 +190,7 @@ class LspSurface {
   /// https://microsoft.github.io/language-server-protocol/specification#textDocumentPositionParams
   Future<LocationsResponse> textDocument_references(ReferenceParams params) async {
     const _method = "textDocument/references";
-    if (!capabilities.definitionProvider) throw UnsupportedMethodException(_method);
+    if (!capabilities.referenceProvider) throw UnsupportedMethodException(_method);
 
     final res = await _requestCompleter.sendRequest(_method, params.json);
     return LocationsResponse(response: res);
@@ -213,10 +214,25 @@ class LspSurface {
   /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_hover
   Future<HoverResponse> textDocument_hover(TextDocumentPositionParams params) async {
     const _method = "textDocument/hover";
-    if (!capabilities.implementationProvider) throw UnsupportedMethodException(_method);
+    if (!capabilities.hoverProvider) throw UnsupportedMethodException(_method);
 
     final res = await _requestCompleter.sendRequest(_method, params.json);
     return HoverResponse(response: res);
+  }
+
+  /// Request highlight information at a given text document position.
+  ///
+  /// Usually highlights all references to the symbol scoped to this file.
+  ///
+  /// As opposed to [textDocument_references], which is across all files.
+  ///
+  /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_documentHighlight
+  Future<DocumentHighlightResponse> textDocument_documentHighlight(TextDocumentPositionParams params) async {
+    const _method = "textDocument/documentHighlight";
+    if (!capabilities.documentHighlightProvider) throw UnsupportedMethodException(_method);
+
+    final res = await _requestCompleter.sendRequest(_method, params.json);
+    return DocumentHighlightResponse(response: res);
   }
 
   //"textDocument/prepareCallHierarchy"
@@ -226,8 +242,6 @@ class LspSurface {
   //"textDocument/typeHierarchy"
   //"typeHierarchy/supertypes"
   //"typeHierarchy/subtypes"
-
-  //"textDocument/documentHighlight"
 
   //"textDocument/documentLink"
   //"documentLink/resolve"

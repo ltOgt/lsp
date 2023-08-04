@@ -226,6 +226,77 @@ void main() {
         ),
       );
     });
+
+    test('Document Highlight', () async {
+      final LspSurface surface = await init("t6");
+      DocumentHighlightResponse r = await surface.textDocument_documentHighlight(
+        kTestClassPosition,
+      );
+
+      surface.dispose();
+
+      expect(r.highlights.length, 5);
+
+      void _expectRanges(
+        DocumentHighlight actual,
+        Position expectedStart,
+        Position expectedEnd,
+        DocumentHighlightKind expectedKind,
+      ) {
+        expect(
+          actual,
+          equals(
+            DocumentHighlight(
+              range: Range(
+                start: expectedStart,
+                end: expectedEnd,
+              ),
+              kind: expectedKind,
+            ),
+          ),
+        );
+      }
+
+      // occurence in class definition (the origin of the request)
+      _expectRanges(
+        r.highlights[0],
+        Position(line: 5, character: 6),
+        Position(line: 5, character: 15),
+        DocumentHighlightKind.text,
+      );
+
+      // occurence in doc string
+      _expectRanges(
+        r.highlights[1],
+        Position(line: 4, character: 31),
+        Position(line: 4, character: 40),
+        DocumentHighlightKind.text,
+      );
+
+      // occurence in constructor
+      _expectRanges(
+        r.highlights[2],
+        Position(line: 10, character: 2),
+        Position(line: 10, character: 11),
+        DocumentHighlightKind.text,
+      );
+
+      // occurence in main() declaration
+      _expectRanges(
+        r.highlights[3],
+        Position(line: 16, character: 2),
+        Position(line: 16, character: 11),
+        DocumentHighlightKind.text,
+      );
+
+      // occurence in main() instantiation
+      _expectRanges(
+        r.highlights[4],
+        Position(line: 16, character: 24),
+        Position(line: 16, character: 33),
+        DocumentHighlightKind.text,
+      );
+    });
   });
 }
 
