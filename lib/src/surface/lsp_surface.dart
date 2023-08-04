@@ -196,8 +196,6 @@ class LspSurface {
     const _method = "textDocument/references";
     if (!capabilities.definitionProvider) throw UnsupportedMethodException(_method);
 
-    final paramsjson = params.json;
-    print(paramsjson);
     final res = await _requestCompleter.sendRequest(_method, params.json);
     return ReferenceResponse(response: res);
   }

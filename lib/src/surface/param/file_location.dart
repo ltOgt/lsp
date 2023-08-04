@@ -26,7 +26,7 @@ class FileLocation {
       };
 
   static FileLocation fromJson(Map map) => FileLocation(
-        range: Range.fromJson(map[_kRange] as Map<String, Object>),
+        range: Range.fromJson(map[_kRange] as Map<String, dynamic>),
         filePath: (map[_kUri] as String).split(_kUriPrefix).last,
       );
 

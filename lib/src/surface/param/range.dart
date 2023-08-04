@@ -33,8 +33,8 @@ class Range {
       };
 
   static Range fromJson(Map map) => Range(
-        start: Position.fromJson(map[_kStart]! as Map<String, Object>),
-        end: Position.fromJson(map[_kEnd]! as Map<String, Object>),
+        start: Position.fromJson(map[_kStart]! as Map<String, dynamic>),
+        end: Position.fromJson(map[_kEnd]! as Map<String, dynamic>),
       );
 
   // ===========================================================================

@@ -14,7 +14,9 @@ class ReferenceParams {
   // ===========================================================================
 
   Map get json => {
-        "includeDeclaration": includeDeclaration,
         ...position.json,
+        "context": {
+          "includeDeclaration": includeDeclaration,
+        },
       };
 }
