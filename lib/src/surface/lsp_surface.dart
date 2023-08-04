@@ -206,15 +206,29 @@ class LspSurface {
     return LocationsResponse(response: res);
   }
 
-  //"textDocument/implementation"
-  //"textDocument/hover"
+  /// Request hover information at a given text document position.
+  ///
+  /// The hover information may e.g. be the doc string of the symbol as Markdown.
+  ///
+  /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_hover
+  Future<HoverResponse> textDocument_hover(TextDocumentPositionParams params) async {
+    const _method = "textDocument/hover";
+    if (!capabilities.implementationProvider) throw UnsupportedMethodException(_method);
+
+    final res = await _requestCompleter.sendRequest(_method, params.json);
+    return HoverResponse(response: res);
+  }
+
   //"textDocument/prepareCallHierarchy"
   //"callHierarchy/incomingCalls"
   //"callHierarchy/outgoingCalls"
+
   //"textDocument/typeHierarchy"
   //"typeHierarchy/supertypes"
   //"typeHierarchy/subtypes"
+
   //"textDocument/documentHighlight"
+
   //"textDocument/documentLink"
   //"documentLink/resolve"
 }

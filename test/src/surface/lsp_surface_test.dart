@@ -208,5 +208,31 @@ void main() {
         ),
       );
     });
+
+    test('Hover', () async {
+      final LspSurface surface = await init("t6");
+      HoverResponse r = await surface.textDocument_hover(
+        kTestClassPosition,
+      );
+
+      surface.dispose();
+
+      expect(r.contents, _expectedHover);
+      expect(
+        r.range,
+        Range(
+          start: Position(line: 5, character: 6),
+          end: Position(line: 5, character: 15),
+        ),
+      );
+    });
   });
 }
+
+const _expectedHover = """```dart
+class TestClass extends BaseClass
+```
+*test/_test_data/semantic_token_source.dart*
+
+---
+This is the docstring for [TestClass]""";
