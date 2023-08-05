@@ -13,7 +13,7 @@ import 'dart:io';
 
 import 'package:lsp/src/surface/response/base_response.dart';
 import 'package:lsp/src/surface/response/text_document/document_highlight_response.dart';
-import 'package:lsp/src/surface/response/text_document/incoming_call_response.dart';
+import 'package:lsp/src/surface/response/text_document/call_hierarchy/incoming_call_response.dart';
 import 'package:lsp/src/surface/unsupported_method_exception.dart';
 import 'package:lsp/src/surface/wireformat.dart';
 
@@ -268,11 +268,26 @@ class LspSurface {
     };
 
     final res = await _requestCompleter.sendRequest(_method, params);
-    return IncomingCallResponse(response: res);
+    return IncomingCallResponse(response: res, to: item);
   }
 
-  //"callHierarchy/incomingCalls"
-  //"callHierarchy/outgoingCalls"
+  /// Request to resolve outgoing calls for a given call hierarchy item.
+  ///
+  /// This is the second step, i.e. follow up for
+  /// - [textDocument_prepareCallHierarchy]
+  ///
+  /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#callHierarchy_outgoingCalls
+  Future<OutgoingCallResponse> callHierarchy_outgoingCalls(CallHierarchyItem item) async {
+    const _method = "callHierarchy/outgoingCalls";
+    if (!capabilities.callHierarchyProvider) throw UnsupportedMethodException(_method);
+
+    final params = {
+      "item": item.json,
+    };
+
+    final res = await _requestCompleter.sendRequest(_method, params);
+    return OutgoingCallResponse(response: res, from: item);
+  }
 
   //"textDocument/typeHierarchy"
   //"typeHierarchy/supertypes"

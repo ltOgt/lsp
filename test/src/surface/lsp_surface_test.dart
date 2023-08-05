@@ -1,7 +1,7 @@
 // ignore_for_file: constant_identifier_names
 import 'dart:io';
 
-import 'package:lsp/src/surface/response/text_document/incoming_call_response.dart';
+import 'package:lsp/src/surface/response/text_document/call_hierarchy/incoming_call_response.dart';
 import 'package:test/test.dart';
 
 import 'package:lsp/lsp.dart';
@@ -401,17 +401,21 @@ void main() {
           kInnerCallPosition,
         );
         expect(r.items.length, 1);
-        final item = r.items.first;
+        final itemThatIsCalled = r.items.first;
 
         IncomingCallResponse r2 = await surface.callHierarchy_incomingCalls(
-          item,
+          itemThatIsCalled,
         );
         surface.dispose();
 
-        // outer call
+        // inner call, i.e. the requester
+        expect(r2.to, itemThatIsCalled);
+
+        // outer call, ie.e the item that is calling
         expect(r2.calls.length, 1);
+        final itemThatIsCalling = r2.calls.first;
         expect(
-          r2.calls.first.from,
+          itemThatIsCalling.from,
           CallHierarchyItem(
             name: "outerCall",
             kind: SymbolKind.constant,
@@ -429,13 +433,62 @@ void main() {
             data: null,
           ),
         );
-        expect(r2.calls.first.fromRanges, isNotEmpty);
-        expect(r2.calls.first.fromRanges.length, 1);
+        expect(itemThatIsCalling.fromRanges, isNotEmpty);
+        expect(itemThatIsCalling.fromRanges.length, 1);
         expect(
-          r2.calls.first.fromRanges.first,
+          itemThatIsCalling.fromRanges.first,
           Range(
             start: Position(line: 22, character: 2),
             end: Position(line: 22, character: 11),
+          ),
+        );
+      });
+
+      test('Resolve Outgoing Calls', () async {
+        final LspSurface surface = await init();
+        PrepareCallHierarchyResponse r = await surface.textDocument_prepareCallHierarchy(
+          kInnerCallPosition,
+        );
+        expect(r.items.length, 1);
+        final itemThatIsCalling = r.items.first;
+
+        OutgoingCallResponse r2 = await surface.callHierarchy_outgoingCalls(
+          itemThatIsCalling,
+        );
+        surface.dispose();
+
+        // inner call, i.e. the requester
+        expect(r2.from, itemThatIsCalling);
+
+        // another call, i.e the item that is being called
+        expect(r2.calls.length, 1);
+        final _itemThatIsCalled = r2.calls.first;
+        expect(
+          _itemThatIsCalled.to,
+          CallHierarchyItem(
+            name: "anotherCall",
+            kind: SymbolKind.constant,
+            tags: null,
+            detail: "semantic_token_source.dart",
+            filePath: SEMANTIC_TEST_FILE_PATH,
+            range: Range(
+              start: Position(line: 29, character: 0),
+              end: Position(line: 29, character: 21),
+            ),
+            selectionRange: Range(
+              start: Position(line: 29, character: 5),
+              end: Position(line: 29, character: 16),
+            ),
+            data: null,
+          ),
+        );
+        expect(_itemThatIsCalled.fromRanges, isNotEmpty);
+        expect(_itemThatIsCalled.fromRanges.length, 1);
+        expect(
+          _itemThatIsCalled.fromRanges.first,
+          Range(
+            start: Position(line: 26, character: 2),
+            end: Position(line: 26, character: 13),
           ),
         );
       });
