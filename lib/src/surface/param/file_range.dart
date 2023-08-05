@@ -51,5 +51,5 @@ class FileRange {
   int get hashCode => start.hashCode ^ end.hashCode;
 
   @override
-  String toString() => 'Range(start: $start, end: $end)';
+  String toString() => 'FileRange(start: $start, end: $end)';
 }

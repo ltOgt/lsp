@@ -45,5 +45,5 @@ class FilePosition {
   int get hashCode => line.hashCode ^ character.hashCode;
 
   @override
-  String toString() => 'Position(line: $line, character: $character)';
+  String toString() => 'FilePosition(line: $line, character: $character)';
 }
