@@ -13,9 +13,9 @@ import 'package:lsp/src/surface/param/reference_params.dart';
 import 'package:lsp/src/surface/param/text_documentation_position_params.dart';
 import 'package:lsp/src/surface/response/base_response.dart';
 import 'package:lsp/src/surface/response/init_response.dart';
-import 'package:lsp/src/surface/response/text_document/call_hierarchy/incoming_call_response.dart';
-import 'package:lsp/src/surface/response/text_document/call_hierarchy/outgoing_call_response.dart';
-import 'package:lsp/src/surface/response/text_document/call_hierarchy/prepare_call_hierarchy_response.dart';
+import 'package:lsp/src/surface/response/text_document/hierarchy/incoming_call_response.dart';
+import 'package:lsp/src/surface/response/text_document/hierarchy/outgoing_call_response.dart';
+import 'package:lsp/src/surface/response/text_document/hierarchy/prepare_hierarchy_response.dart';
 import 'package:lsp/src/surface/response/text_document/document_highlight_response.dart';
 import 'package:lsp/src/surface/response/text_document/hover_response.dart';
 import 'package:lsp/src/surface/response/text_document/locations_response.dart';
@@ -242,7 +242,7 @@ class LspSurface {
     return DocumentHighlightResponse(response: res);
   }
 
-  /// Request a call hierarchy for the language element of given text document positions.
+  /// Request a call hierarchy for the language element of given text document position.
   ///
   /// This is the first step, which resolves a hierarchy item
   ///
@@ -251,12 +251,12 @@ class LspSurface {
   /// - [callHierarchy_outgoingCalls]
   ///
   /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_prepareCallHierarchy
-  Future<PrepareCallHierarchyResponse> textDocument_prepareCallHierarchy(TextDocumentPositionParams params) async {
+  Future<PrepareHierarchyResponse> textDocument_prepareCallHierarchy(TextDocumentPositionParams params) async {
     const _method = "textDocument/prepareCallHierarchy";
     if (!capabilities.callHierarchyProvider) throw UnsupportedMethodException(_method);
 
     final res = await _requestCompleter.sendRequest(_method, params.json);
-    return PrepareCallHierarchyResponse(response: res);
+    return PrepareHierarchyResponse(response: res);
   }
 
   /// Request to resolve incoming calls for a given call hierarchy item.
@@ -265,7 +265,7 @@ class LspSurface {
   /// - [textDocument_prepareCallHierarchy]
   ///
   /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#callHierarchy_incomingCalls
-  Future<IncomingCallResponse> callHierarchy_incomingCalls(CallHierarchyItem item) async {
+  Future<IncomingCallResponse> callHierarchy_incomingCalls(HierarchyItem item) async {
     const _method = "callHierarchy/incomingCalls";
     if (!capabilities.callHierarchyProvider) throw UnsupportedMethodException(_method);
 
@@ -283,7 +283,7 @@ class LspSurface {
   /// - [textDocument_prepareCallHierarchy]
   ///
   /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#callHierarchy_outgoingCalls
-  Future<OutgoingCallResponse> callHierarchy_outgoingCalls(CallHierarchyItem item) async {
+  Future<OutgoingCallResponse> callHierarchy_outgoingCalls(HierarchyItem item) async {
     const _method = "callHierarchy/outgoingCalls";
     if (!capabilities.callHierarchyProvider) throw UnsupportedMethodException(_method);
 
@@ -295,7 +295,23 @@ class LspSurface {
     return OutgoingCallResponse(response: res, from: item);
   }
 
-  //"textDocument/typeHierarchy"
+  /// Request a type hierarchy for the language element of given text document position.
+  ///
+  /// This is the first step, which resolves a hierarchy item
+  ///
+  /// Follow up with
+  /// - [typeHierarchy_incomingCalls]
+  /// - [typeHierarchy_outgoingCalls]
+  ///
+  /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_prepareTypeHierarchy
+  Future<PrepareHierarchyResponse> textDocument_prepareTypeHierarchy(TextDocumentPositionParams params) async {
+    const _method = "textDocument/prepareTypeHierarchy";
+    if (!capabilities.typeHierarchyProvider) throw UnsupportedMethodException(_method);
+
+    final res = await _requestCompleter.sendRequest(_method, params.json);
+    return PrepareHierarchyResponse(response: res);
+  }
+
   //"typeHierarchy/supertypes"
   //"typeHierarchy/subtypes"
 

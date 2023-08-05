@@ -1,7 +1,6 @@
 // ignore_for_file: constant_identifier_names
 import 'dart:io';
 
-import 'package:lsp/src/surface/response/text_document/call_hierarchy/incoming_call_response.dart';
 import 'package:test/test.dart';
 
 import 'package:lsp/lsp.dart';
@@ -356,7 +355,7 @@ void main() {
     group("Call Hierarchy", () {
       test('Prepare Call hierarchy', () async {
         final LspSurface surface = await init();
-        PrepareCallHierarchyResponse r = await surface.textDocument_prepareCallHierarchy(
+        PrepareHierarchyResponse r = await surface.textDocument_prepareCallHierarchy(
           kInnerCallPosition,
         );
         surface.dispose();
@@ -364,7 +363,7 @@ void main() {
         expect(r.items.length, 1);
         expect(
           r.items.first,
-          CallHierarchyItem(
+          HierarchyItem(
             name: "innerCall",
             kind: SymbolKind.constant,
             tags: null,
@@ -397,7 +396,7 @@ void main() {
 
       test('Resolve Incomming Calls', () async {
         final LspSurface surface = await init();
-        PrepareCallHierarchyResponse r = await surface.textDocument_prepareCallHierarchy(
+        PrepareHierarchyResponse r = await surface.textDocument_prepareCallHierarchy(
           kInnerCallPosition,
         );
         expect(r.items.length, 1);
@@ -416,7 +415,7 @@ void main() {
         final itemThatIsCalling = r2.calls.first;
         expect(
           itemThatIsCalling.from,
-          CallHierarchyItem(
+          HierarchyItem(
             name: "outerCall",
             kind: SymbolKind.constant,
             tags: null,
@@ -446,7 +445,7 @@ void main() {
 
       test('Resolve Outgoing Calls', () async {
         final LspSurface surface = await init();
-        PrepareCallHierarchyResponse r = await surface.textDocument_prepareCallHierarchy(
+        PrepareHierarchyResponse r = await surface.textDocument_prepareCallHierarchy(
           kInnerCallPosition,
         );
         expect(r.items.length, 1);
@@ -465,7 +464,7 @@ void main() {
         final _itemThatIsCalled = r2.calls.first;
         expect(
           _itemThatIsCalled.to,
-          CallHierarchyItem(
+          HierarchyItem(
             name: "anotherCall",
             kind: SymbolKind.constant,
             tags: null,
@@ -489,6 +488,45 @@ void main() {
           Range(
             start: Position(line: 26, character: 2),
             end: Position(line: 26, character: 13),
+          ),
+        );
+      });
+    });
+
+    // =========================================================================
+    // =========================================================================
+    // =========================================================================
+
+    group("Type Hierarchy", () {
+      test('Prepare Type hierarchy', () async {
+        final LspSurface surface = await init();
+        PrepareHierarchyResponse r = await surface.textDocument_prepareTypeHierarchy(
+          kTestClassPosition,
+        );
+        surface.dispose();
+
+        expect(r.items.length, 1);
+
+        expect(
+          r.items.first,
+          HierarchyItem(
+            name: "TestClass",
+            kind: SymbolKind.property,
+            tags: null,
+            detail: null,
+            filePath: SEMANTIC_TEST_FILE_PATH,
+            range: Range(
+              start: Position(line: 4, character: 0),
+              end: Position(line: 13, character: 1),
+            ),
+            selectionRange: Range(
+              start: Position(line: 5, character: 6),
+              end: Position(line: 5, character: 15),
+            ),
+            data: {
+              "ref":
+                  "file:///Users/omni/repos/package/lsp/test/_test_data/semantic_token_source.dart;file:///Users/omni/repos/package/lsp/test/_test_data/semantic_token_source.dart;TestClass",
+            },
           ),
         );
       });

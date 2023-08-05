@@ -4,21 +4,26 @@ import 'package:collection/collection.dart';
 import 'package:lsp/src/surface/param/range.dart';
 import 'package:lsp/src/surface/response/base_response.dart';
 
-/// The result of a "textDocument/prepareCallHierarchy" request.
+/// The result of one of
+/// - "textDocument/prepareCallHierarchy"
+/// - "textDocument/prepareTypeHierarchy"
 ///
-/// See [CallHierarchyItem] for details.
-class PrepareCallHierarchyResponse extends BaseResponse {
-  late final List<CallHierarchyItem> items;
+/// See [HierarchyItem] for details.
+class PrepareHierarchyResponse extends BaseResponse {
+  late final List<HierarchyItem> items;
 
-  PrepareCallHierarchyResponse({
+  PrepareHierarchyResponse({
     required LspResponse response,
   }) : super(response: response) {
-    items = response.results?.map(CallHierarchyItem.fromJson).toList() ?? [];
+    items = response.results?.map(HierarchyItem.fromJson).toList() ?? [];
   }
 }
 
+/// An item of a hierarchy, for calls or types.
+///
 /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#callHierarchyItem
-class CallHierarchyItem {
+/// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#typeHierarchyItem
+class HierarchyItem {
   /// The name of this item.
   final String name;
 
@@ -48,7 +53,7 @@ class CallHierarchyItem {
   /// incoming calls or outgoing calls requests.
   final dynamic data;
 
-  CallHierarchyItem({
+  HierarchyItem({
     required this.name,
     required this.kind,
     required this.tags,
@@ -82,7 +87,7 @@ class CallHierarchyItem {
         _kData: data,
       };
 
-  static CallHierarchyItem fromJson(Map map) => CallHierarchyItem(
+  static HierarchyItem fromJson(Map map) => HierarchyItem(
         name: map[_kName],
         kind: SymbolKind.fromValue(map[_kKind] as int),
         tags: _decodeTags(map),
@@ -102,7 +107,7 @@ class CallHierarchyItem {
   // ===========================================================================
 
   @override
-  bool operator ==(covariant CallHierarchyItem other) {
+  bool operator ==(covariant HierarchyItem other) {
     if (identical(this, other)) return true;
     final listEquals = const DeepCollectionEquality().equals;
 
@@ -113,7 +118,7 @@ class CallHierarchyItem {
         other.filePath == filePath &&
         other.range == range &&
         other.selectionRange == selectionRange &&
-        other.data == data;
+        listEquals(other.data, data);
   }
 
   @override
@@ -127,12 +132,12 @@ class CallHierarchyItem {
         filePath.hashCode ^
         range.hashCode ^
         selectionRange.hashCode ^
-        data.hashCode;
+        listHash(data);
   }
 
   @override
   String toString() {
-    return 'CallHierarchyItem(name: $name, kind: $kind, tags: $tags, detail: $detail, filePath: $filePath, range: $range, selectionRange: $selectionRange, data: $data)';
+    return 'HierarchyItem(name: $name, kind: $kind, tags: $tags, detail: $detail, filePath: $filePath, range: $range, selectionRange: $selectionRange, data: $data)';
   }
 }
 

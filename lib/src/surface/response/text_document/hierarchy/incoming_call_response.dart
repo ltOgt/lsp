@@ -1,14 +1,14 @@
 import 'package:lsp/src/surface/param/range.dart';
 import 'package:lsp/src/surface/response/base_response.dart';
-import 'package:lsp/src/surface/response/text_document/call_hierarchy/prepare_call_hierarchy_response.dart';
+import 'package:lsp/src/surface/response/text_document/hierarchy/prepare_hierarchy_response.dart';
 
-/// The result of a "textDocument/hover" request.
+/// The result of a "callHierarchy/incomingCalls" request.
 ///
 /// See [CallHierarchyIncomingCall] for details.
 class IncomingCallResponse extends BaseResponse {
   late final List<CallHierarchyIncomingCall> calls;
 
-  final CallHierarchyItem to;
+  final HierarchyItem to;
 
   IncomingCallResponse({
     required LspResponse response,
@@ -24,7 +24,7 @@ class IncomingCallResponse extends BaseResponse {
 /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#callHierarchyIncomingCall
 class CallHierarchyIncomingCall {
   /// The item that makes the call to [IncomingCallResponse.to]
-  final CallHierarchyItem from;
+  final HierarchyItem from;
 
   /// The ranges at which the calls appear.
   /// This is relative to the caller: [from].
@@ -47,7 +47,7 @@ class CallHierarchyIncomingCall {
       };
 
   static CallHierarchyIncomingCall fromJson(Map map) => CallHierarchyIncomingCall(
-        from: CallHierarchyItem.fromJson(map[_kFrom] as Map<String, dynamic>),
+        from: HierarchyItem.fromJson(map[_kFrom] as Map<String, dynamic>),
         fromRanges: _decodeRanges(map),
       );
 
