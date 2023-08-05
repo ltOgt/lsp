@@ -13,6 +13,7 @@ import 'package:lsp/src/surface/param/reference_params.dart';
 import 'package:lsp/src/surface/param/text_documentation_position_params.dart';
 import 'package:lsp/src/surface/response/base_response.dart';
 import 'package:lsp/src/surface/response/init_response.dart';
+import 'package:lsp/src/surface/response/text_document/hierarchy/hierarchy_items_response.dart';
 import 'package:lsp/src/surface/response/text_document/hierarchy/incoming_call_response.dart';
 import 'package:lsp/src/surface/response/text_document/hierarchy/outgoing_call_response.dart';
 import 'package:lsp/src/surface/response/text_document/hierarchy/prepare_hierarchy_response.dart';
@@ -300,8 +301,8 @@ class LspSurface {
   /// This is the first step, which resolves a hierarchy item
   ///
   /// Follow up with
-  /// - [typeHierarchy_incomingCalls]
-  /// - [typeHierarchy_outgoingCalls]
+  /// - [typeHierarchy_superTypes]
+  /// - [typeHierarchy_subTypes]
   ///
   /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_prepareTypeHierarchy
   Future<PrepareHierarchyResponse> textDocument_prepareTypeHierarchy(TextDocumentPositionParams params) async {
@@ -312,8 +313,49 @@ class LspSurface {
     return PrepareHierarchyResponse(response: res);
   }
 
-  //"typeHierarchy/supertypes"
-  //"typeHierarchy/subtypes"
+  /// Request to resolve super types for a given call hierarchy [item].
+  ///
+  /// This is the second step, i.e. follow up for
+  /// - [textDocument_prepareTypeHierarchy]
+  ///
+  /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#typeHierarchy_supertypes
+  Future<HierarchyItemsResponse> typeHierarchy_superTypes(HierarchyItem item) async {
+    const _method = "typeHierarchy/supertypes";
+    if (!capabilities.typeHierarchyProvider) throw UnsupportedMethodException(_method);
+
+    final params = {
+      "item": item.json,
+    };
+
+    final res = await _requestCompleter.sendRequest(_method, params);
+    return HierarchyItemsResponse(
+      response: res,
+      from: item,
+      kind: HierarchyItemsResponseKind.superType,
+    );
+  }
+
+  /// Request to resolve sub types for a given call hierarchy [item].
+  ///
+  /// This is the second step, i.e. follow up for
+  /// - [textDocument_prepareTypeHierarchy]
+  ///
+  /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#typeHierarchy_subtypes
+  Future<HierarchyItemsResponse> typeHierarchy_subTypes(HierarchyItem item) async {
+    const _method = "typeHierarchy/subtypes";
+    if (!capabilities.typeHierarchyProvider) throw UnsupportedMethodException(_method);
+
+    final params = {
+      "item": item.json,
+    };
+
+    final res = await _requestCompleter.sendRequest(_method, params);
+    return HierarchyItemsResponse(
+      response: res,
+      from: item,
+      kind: HierarchyItemsResponseKind.subType,
+    );
+  }
 
   //"textDocument/documentLink"
   //"documentLink/resolve"

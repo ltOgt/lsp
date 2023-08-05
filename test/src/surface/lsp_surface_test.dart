@@ -1,6 +1,7 @@
 // ignore_for_file: constant_identifier_names
 import 'dart:io';
 
+import 'package:lsp/src/surface/response/text_document/hierarchy/hierarchy_items_response.dart';
 import 'package:test/test.dart';
 
 import 'package:lsp/lsp.dart';
@@ -365,7 +366,7 @@ void main() {
           r.items.first,
           HierarchyItem(
             name: "innerCall",
-            kind: SymbolKind.constant,
+            kind: SymbolKind.function,
             tags: null,
             detail: "semantic_token_source.dart",
             filePath: SEMANTIC_TEST_FILE_PATH,
@@ -417,7 +418,7 @@ void main() {
           itemThatIsCalling.from,
           HierarchyItem(
             name: "outerCall",
-            kind: SymbolKind.constant,
+            kind: SymbolKind.function,
             tags: null,
             detail: "semantic_token_source.dart",
             filePath: SEMANTIC_TEST_FILE_PATH,
@@ -466,7 +467,7 @@ void main() {
           _itemThatIsCalled.to,
           HierarchyItem(
             name: "anotherCall",
-            kind: SymbolKind.constant,
+            kind: SymbolKind.function,
             tags: null,
             detail: "semantic_token_source.dart",
             filePath: SEMANTIC_TEST_FILE_PATH,
@@ -511,7 +512,7 @@ void main() {
           r.items.first,
           HierarchyItem(
             name: "TestClass",
-            kind: SymbolKind.property,
+            kind: SymbolKind.class_,
             tags: null,
             detail: null,
             filePath: SEMANTIC_TEST_FILE_PATH,
@@ -526,6 +527,95 @@ void main() {
             data: {
               "ref":
                   "file:///Users/omni/repos/package/lsp/test/_test_data/semantic_token_source.dart;file:///Users/omni/repos/package/lsp/test/_test_data/semantic_token_source.dart;TestClass",
+            },
+          ),
+        );
+      });
+
+      test('Resolve Supertypes', () async {
+        final LspSurface surface = await init();
+        PrepareHierarchyResponse r = await surface.textDocument_prepareTypeHierarchy(
+          kTestClassPosition,
+        );
+        expect(r.items.length, 1);
+        final subType = r.items.first;
+
+        HierarchyItemsResponse r2 = await surface.typeHierarchy_superTypes(
+          subType,
+        );
+        surface.dispose();
+
+        // subType, i.e. the requester
+        expect(r2.from, subType);
+        expect(r2.kind, HierarchyItemsResponseKind.superType);
+
+        // super type, i.e the item that is requested
+        expect(r2.items.length, 1);
+        final superType = r2.items.first;
+        expect(
+          superType,
+          HierarchyItem(
+            name: "BaseClass",
+            kind: SymbolKind.class_,
+            tags: null,
+            detail: null,
+            filePath: SEMANTIC_TEST_FILE_PATH,
+            range: Range(
+              start: Position(line: 0, character: 0),
+              end: Position(line: 2, character: 1),
+            ),
+            selectionRange: Range(
+              start: Position(line: 0, character: 15),
+              end: Position(line: 0, character: 24),
+            ),
+            data: {
+              "ref":
+                  "file:///Users/omni/repos/package/lsp/test/_test_data/semantic_token_source.dart;file:///Users/omni/repos/package/lsp/test/_test_data/semantic_token_source.dart;BaseClass"
+            },
+          ),
+        );
+      });
+
+      test('Resolve Subtypes', () async {
+        final LspSurface surface = await init();
+        PrepareHierarchyResponse r = await surface.textDocument_prepareTypeHierarchy(
+          kBaseClassPosition,
+        );
+        expect(r.items.length, 1);
+        final superType = r.items.first;
+
+        HierarchyItemsResponse r2 = await surface.typeHierarchy_subTypes(
+          superType,
+        );
+        surface.dispose();
+
+        // superType, i.e. the requester
+        expect(r2.from, superType);
+        expect(r2.kind, HierarchyItemsResponseKind.subType);
+
+        // subType, i.e the item that is requested
+        expect(r2.items.length, 1);
+        final subType = r2.items.first;
+
+        expect(
+          subType,
+          HierarchyItem(
+            name: "TestClass",
+            kind: SymbolKind.class_,
+            tags: null,
+            detail: null,
+            filePath: SEMANTIC_TEST_FILE_PATH,
+            range: Range(
+              start: Position(line: 4, character: 0),
+              end: Position(line: 13, character: 1),
+            ),
+            selectionRange: Range(
+              start: Position(line: 5, character: 6),
+              end: Position(line: 5, character: 15),
+            ),
+            data: {
+              "ref":
+                  "file:///Users/omni/repos/package/lsp/test/_test_data/semantic_token_source.dart;file:///Users/omni/repos/package/lsp/test/_test_data/semantic_token_source.dart;TestClass"
             },
           ),
         );
