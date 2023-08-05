@@ -356,9 +356,6 @@ class LspSurface {
       kind: HierarchyItemsResponseKind.subType,
     );
   }
-
-  //"textDocument/documentLink"
-  //"documentLink/resolve"
 }
 
 // =============================================================================

@@ -1,7 +1,6 @@
 // ignore_for_file: constant_identifier_names
 import 'dart:io';
 
-import 'package:lsp/src/surface/response/text_document/hierarchy/hierarchy_items_response.dart';
 import 'package:test/test.dart';
 
 import 'package:lsp/lsp.dart';
