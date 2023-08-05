@@ -80,5 +80,5 @@ enum DocumentHighlightKind {
 
   static DocumentHighlightKind? fromValueOrNull(int? value) => value == null //
       ? null
-      : DocumentHighlightKind.values[value + 1];
+      : DocumentHighlightKind.values[value - 1];
 }

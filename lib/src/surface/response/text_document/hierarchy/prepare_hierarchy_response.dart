@@ -172,7 +172,7 @@ enum SymbolKind {
   const SymbolKind(this.value);
   final int value;
 
-  static SymbolKind fromValue(int value) => SymbolKind.values[value + 1];
+  static SymbolKind fromValue(int value) => SymbolKind.values[value - 1];
 }
 
 enum SymbolTag {
@@ -181,5 +181,5 @@ enum SymbolTag {
   const SymbolTag(this.value);
   final int value;
 
-  static SymbolTag fromValue(int value) => SymbolTag.values[value + 1];
+  static SymbolTag fromValue(int value) => SymbolTag.values[value - 1];
 }

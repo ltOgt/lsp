@@ -17,6 +17,7 @@ export 'src/surface/response/text_document/document_highlight_response.dart';
 export 'src/surface/response/text_document/hierarchy/prepare_hierarchy_response.dart';
 export 'src/surface/response/text_document/hierarchy/incoming_call_response.dart';
 export 'src/surface/response/text_document/hierarchy/outgoing_call_response.dart';
+export 'src/surface/response/text_document/hierarchy/hierarchy_items_response.dart';
 
 // =============================================================================
 // For extracting semantic tokens and modifiers
