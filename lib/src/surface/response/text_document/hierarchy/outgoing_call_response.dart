@@ -1,4 +1,4 @@
-import 'package:lsp/src/surface/param/range.dart';
+import 'package:lsp/src/surface/param/file_range.dart';
 import 'package:lsp/src/surface/response/base_response.dart';
 import 'package:lsp/src/surface/response/text_document/hierarchy/prepare_hierarchy_response.dart';
 
@@ -20,7 +20,7 @@ class OutgoingCallResponse extends BaseResponse {
   }
 }
 
-/// Contains [Range]s ([fromRanges], relative to the caller used for the request)
+/// Contains [FileRange]s ([fromRanges], relative to the caller used for the request)
 /// from which the [HierarchyItem] ([to]) is called.
 ///
 /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#callHierarchyOutgoingCall
@@ -33,7 +33,7 @@ class CallHierarchyOutgoingCall {
   /// e.g the item passed to `callHierarchy/outgoingCalls` request.
   ///
   /// See [OutgoingCallResponse.from]
-  final List<Range> fromRanges;
+  final List<FileRange> fromRanges;
 
   CallHierarchyOutgoingCall({
     required this.to,
@@ -56,11 +56,11 @@ class CallHierarchyOutgoingCall {
         fromRanges: _decodeRanges(map),
       );
 
-  static List<Range> _decodeRanges(Map map) {
+  static List<FileRange> _decodeRanges(Map map) {
     final list = map[_kFromRanges] as List;
     list.cast<Map>();
     return list.map((e) {
-      return Range.fromJson(e as Map<String, dynamic>);
+      return FileRange.fromJson(e as Map<String, dynamic>);
     }).toList();
   }
 }

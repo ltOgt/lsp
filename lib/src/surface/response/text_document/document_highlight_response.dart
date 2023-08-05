@@ -1,5 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:lsp/src/surface/param/range.dart';
+import 'package:lsp/src/surface/param/file_range.dart';
 import 'package:lsp/src/surface/response/base_response.dart';
 
 /// The result of a "textDocument/documentHighlight" request.
@@ -24,7 +24,7 @@ class DocumentHighlightResponse extends BaseResponse {
 /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_documentHighlight
 class DocumentHighlight {
   /// The range this highlight applies to.
-  final Range range;
+  final FileRange range;
 
   /// The highlight kind.
   final DocumentHighlightKind? kind;
@@ -45,7 +45,7 @@ class DocumentHighlight {
       };
 
   static DocumentHighlight fromJson(Map map) => DocumentHighlight(
-        range: Range.fromJson(map[_kRange] as Map<String, dynamic>),
+        range: FileRange.fromJson(map[_kRange] as Map<String, dynamic>),
         kind: DocumentHighlightKind.fromValueOrNull(map[_kKind] as int?),
       );
 

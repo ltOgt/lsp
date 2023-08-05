@@ -30,8 +30,8 @@ export '/src/semantics/token_decoder.dart';
 // Containers to encapsulate data packages
 export 'src/object/semantic/token.dart';
 export 'src/surface/param/file_location.dart';
-export 'src/surface/param/position.dart';
-export 'src/surface/param/range.dart';
+export 'src/surface/param/file_position.dart';
+export 'src/surface/param/file_range.dart';
 export 'src/surface/param/reference_params.dart';
 export 'src/surface/param/text_document_identifier.dart';
 export 'src/surface/param/text_documentation_position_params.dart';

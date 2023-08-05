@@ -1,5 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:lsp/src/surface/param/position.dart';
+import 'package:lsp/src/surface/param/file_position.dart';
 
 /// A range in a text document expressed as (zero-based) start and end [Positions].
 ///
@@ -10,14 +10,14 @@ import 'package:lsp/src/surface/param/position.dart';
 /// then use an end position denoting the start of the next line
 ///
 /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#range
-class Range {
+class FileRange {
   /// The ranges start position (inclusive).
-  final Position start;
+  final FilePosition start;
 
   /// The ranges end position (exclusive).
-  final Position end;
+  final FilePosition end;
 
-  Range({
+  FileRange({
     required this.start,
     required this.end,
   });
@@ -33,15 +33,15 @@ class Range {
         _kEnd: end.json,
       };
 
-  static Range fromJson(Map map) => Range(
-        start: Position.fromJson(map[_kStart]! as Map<String, dynamic>),
-        end: Position.fromJson(map[_kEnd]! as Map<String, dynamic>),
+  static FileRange fromJson(Map map) => FileRange(
+        start: FilePosition.fromJson(map[_kStart]! as Map<String, dynamic>),
+        end: FilePosition.fromJson(map[_kEnd]! as Map<String, dynamic>),
       );
 
   // ===========================================================================
 
   @override
-  bool operator ==(covariant Range other) {
+  bool operator ==(covariant FileRange other) {
     if (identical(this, other)) return true;
 
     return other.start == start && other.end == end;

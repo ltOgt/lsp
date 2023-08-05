@@ -2,7 +2,7 @@
 /// Position in a text document expressed as zero-based line and zero-based character offset.
 ///
 /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#position
-class Position {
+class FilePosition {
   /// Line position in a document (zero-based).
   final int line;
 
@@ -11,7 +11,7 @@ class Position {
   /// The meaning of this offset is determined by the negotiated `PositionEncodingKind`.
   final int character;
 
-  const Position({
+  const FilePosition({
     required this.line,
     required this.character,
   });
@@ -27,7 +27,7 @@ class Position {
         _kCharacter: character,
       };
 
-  static Position fromJson(Map map) => Position(
+  static FilePosition fromJson(Map map) => FilePosition(
         line: map[_kLine],
         character: map[_kCharacter],
       );
@@ -35,7 +35,7 @@ class Position {
   // ===========================================================================
 
   @override
-  bool operator ==(covariant Position other) {
+  bool operator ==(covariant FilePosition other) {
     if (identical(this, other)) return true;
 
     return other.line == line && other.character == character;

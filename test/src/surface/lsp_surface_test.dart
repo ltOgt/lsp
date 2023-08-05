@@ -15,7 +15,7 @@ const String SEMANTIC_TEST_FILE_PATH = ROOT_PATH + "test/_test_data/semantic_tok
 const kTestClassPosition = TextDocumentPositionParams(
   textDocument: TextDocumentIdentifier(SEMANTIC_TEST_FILE_PATH),
   // "TestClass" in "class TestClass extends BaseClass"
-  position: Position(
+  position: FilePosition(
     line: 5,
     character: 10,
   ),
@@ -23,7 +23,7 @@ const kTestClassPosition = TextDocumentPositionParams(
 const kBaseClassPosition = TextDocumentPositionParams(
   textDocument: TextDocumentIdentifier(SEMANTIC_TEST_FILE_PATH),
   // "TestClass" in "class TestClass extends BaseClass"
-  position: Position(
+  position: FilePosition(
     line: 0,
     character: 19,
   ),
@@ -31,7 +31,7 @@ const kBaseClassPosition = TextDocumentPositionParams(
 
 const kInnerCallPosition = TextDocumentPositionParams(
   textDocument: TextDocumentIdentifier(SEMANTIC_TEST_FILE_PATH),
-  position: Position(
+  position: FilePosition(
     line: 25,
     character: 10,
   ),
@@ -178,13 +178,13 @@ void main() {
       surface.dispose();
       expect(r.fileLocations.length, equals(4));
 
-      void _expectRanges(FileLocation actual, Position start, Position end) {
+      void _expectRanges(FileLocation actual, FilePosition start, FilePosition end) {
         expect(
           actual,
           equals(
             FileLocation(
               filePath: SEMANTIC_TEST_FILE_PATH,
-              range: Range(
+              range: FileRange(
                 // occurence in doc string
                 start: start,
                 end: end,
@@ -197,29 +197,29 @@ void main() {
       // occurence in doc string
       _expectRanges(
         r.fileLocations[0],
-        Position(line: 4, character: 31),
-        Position(line: 4, character: 40),
+        FilePosition(line: 4, character: 31),
+        FilePosition(line: 4, character: 40),
       );
 
       // occurence in constructor
       _expectRanges(
         r.fileLocations[1],
-        Position(line: 10, character: 2),
-        Position(line: 10, character: 11),
+        FilePosition(line: 10, character: 2),
+        FilePosition(line: 10, character: 11),
       );
 
       // occurence in main() declaration
       _expectRanges(
         r.fileLocations[2],
-        Position(line: 16, character: 2),
-        Position(line: 16, character: 11),
+        FilePosition(line: 16, character: 2),
+        FilePosition(line: 16, character: 11),
       );
 
       // occurence in main() instantiation
       _expectRanges(
         r.fileLocations[3],
-        Position(line: 16, character: 24),
-        Position(line: 16, character: 33),
+        FilePosition(line: 16, character: 24),
+        FilePosition(line: 16, character: 33),
       );
     });
 
@@ -242,9 +242,9 @@ void main() {
           /// "TestClass" in "class TestClass extends BaseClass"
           FileLocation(
             filePath: SEMANTIC_TEST_FILE_PATH,
-            range: Range(
-              start: Position(line: 5, character: 6),
-              end: Position(line: 5, character: 15),
+            range: FileRange(
+              start: FilePosition(line: 5, character: 6),
+              end: FilePosition(line: 5, character: 15),
             ),
           ),
         ),
@@ -266,9 +266,9 @@ void main() {
       expect(r.contents, _expectedHover);
       expect(
         r.range,
-        Range(
-          start: Position(line: 5, character: 6),
-          end: Position(line: 5, character: 15),
+        FileRange(
+          start: FilePosition(line: 5, character: 6),
+          end: FilePosition(line: 5, character: 15),
         ),
       );
     });
@@ -289,15 +289,15 @@ void main() {
 
       void _expectRanges(
         DocumentHighlight actual,
-        Position expectedStart,
-        Position expectedEnd,
+        FilePosition expectedStart,
+        FilePosition expectedEnd,
         DocumentHighlightKind? expectedKind,
       ) {
         expect(
           actual,
           equals(
             DocumentHighlight(
-              range: Range(
+              range: FileRange(
                 start: expectedStart,
                 end: expectedEnd,
               ),
@@ -310,40 +310,40 @@ void main() {
       // occurence in class definition (the origin of the request)
       _expectRanges(
         r.highlights[0],
-        Position(line: 5, character: 6),
-        Position(line: 5, character: 15),
+        FilePosition(line: 5, character: 6),
+        FilePosition(line: 5, character: 15),
         null,
       );
 
       // occurence in doc string
       _expectRanges(
         r.highlights[1],
-        Position(line: 4, character: 31),
-        Position(line: 4, character: 40),
+        FilePosition(line: 4, character: 31),
+        FilePosition(line: 4, character: 40),
         null,
       );
 
       // occurence in constructor
       _expectRanges(
         r.highlights[2],
-        Position(line: 10, character: 2),
-        Position(line: 10, character: 11),
+        FilePosition(line: 10, character: 2),
+        FilePosition(line: 10, character: 11),
         null,
       );
 
       // occurence in main() declaration
       _expectRanges(
         r.highlights[3],
-        Position(line: 16, character: 2),
-        Position(line: 16, character: 11),
+        FilePosition(line: 16, character: 2),
+        FilePosition(line: 16, character: 11),
         null,
       );
 
       // occurence in main() instantiation
       _expectRanges(
         r.highlights[4],
-        Position(line: 16, character: 24),
-        Position(line: 16, character: 33),
+        FilePosition(line: 16, character: 24),
+        FilePosition(line: 16, character: 33),
         null,
       );
     });
@@ -369,22 +369,22 @@ void main() {
             tags: null,
             detail: "semantic_token_source.dart",
             filePath: SEMANTIC_TEST_FILE_PATH,
-            range: Range(
-              start: Position(
+            range: FileRange(
+              start: FilePosition(
                 line: 25,
                 character: 0,
               ),
-              end: Position(
+              end: FilePosition(
                 line: 27,
                 character: 1,
               ),
             ),
-            selectionRange: Range(
-              start: Position(
+            selectionRange: FileRange(
+              start: FilePosition(
                 line: 25,
                 character: 5,
               ),
-              end: Position(
+              end: FilePosition(
                 line: 25,
                 character: 14,
               ),
@@ -421,13 +421,13 @@ void main() {
             tags: null,
             detail: "semantic_token_source.dart",
             filePath: SEMANTIC_TEST_FILE_PATH,
-            range: Range(
-              start: Position(line: 21, character: 0),
-              end: Position(line: 23, character: 1),
+            range: FileRange(
+              start: FilePosition(line: 21, character: 0),
+              end: FilePosition(line: 23, character: 1),
             ),
-            selectionRange: Range(
-              start: Position(line: 21, character: 5),
-              end: Position(line: 21, character: 14),
+            selectionRange: FileRange(
+              start: FilePosition(line: 21, character: 5),
+              end: FilePosition(line: 21, character: 14),
             ),
             data: null,
           ),
@@ -436,9 +436,9 @@ void main() {
         expect(itemThatIsCalling.fromRanges.length, 1);
         expect(
           itemThatIsCalling.fromRanges.first,
-          Range(
-            start: Position(line: 22, character: 2),
-            end: Position(line: 22, character: 11),
+          FileRange(
+            start: FilePosition(line: 22, character: 2),
+            end: FilePosition(line: 22, character: 11),
           ),
         );
       });
@@ -470,13 +470,13 @@ void main() {
             tags: null,
             detail: "semantic_token_source.dart",
             filePath: SEMANTIC_TEST_FILE_PATH,
-            range: Range(
-              start: Position(line: 29, character: 0),
-              end: Position(line: 29, character: 21),
+            range: FileRange(
+              start: FilePosition(line: 29, character: 0),
+              end: FilePosition(line: 29, character: 21),
             ),
-            selectionRange: Range(
-              start: Position(line: 29, character: 5),
-              end: Position(line: 29, character: 16),
+            selectionRange: FileRange(
+              start: FilePosition(line: 29, character: 5),
+              end: FilePosition(line: 29, character: 16),
             ),
             data: null,
           ),
@@ -485,9 +485,9 @@ void main() {
         expect(_itemThatIsCalled.fromRanges.length, 1);
         expect(
           _itemThatIsCalled.fromRanges.first,
-          Range(
-            start: Position(line: 26, character: 2),
-            end: Position(line: 26, character: 13),
+          FileRange(
+            start: FilePosition(line: 26, character: 2),
+            end: FilePosition(line: 26, character: 13),
           ),
         );
       });
@@ -515,13 +515,13 @@ void main() {
             tags: null,
             detail: null,
             filePath: SEMANTIC_TEST_FILE_PATH,
-            range: Range(
-              start: Position(line: 4, character: 0),
-              end: Position(line: 13, character: 1),
+            range: FileRange(
+              start: FilePosition(line: 4, character: 0),
+              end: FilePosition(line: 13, character: 1),
             ),
-            selectionRange: Range(
-              start: Position(line: 5, character: 6),
-              end: Position(line: 5, character: 15),
+            selectionRange: FileRange(
+              start: FilePosition(line: 5, character: 6),
+              end: FilePosition(line: 5, character: 15),
             ),
             data: {
               "ref":
@@ -559,13 +559,13 @@ void main() {
             tags: null,
             detail: null,
             filePath: SEMANTIC_TEST_FILE_PATH,
-            range: Range(
-              start: Position(line: 0, character: 0),
-              end: Position(line: 2, character: 1),
+            range: FileRange(
+              start: FilePosition(line: 0, character: 0),
+              end: FilePosition(line: 2, character: 1),
             ),
-            selectionRange: Range(
-              start: Position(line: 0, character: 15),
-              end: Position(line: 0, character: 24),
+            selectionRange: FileRange(
+              start: FilePosition(line: 0, character: 15),
+              end: FilePosition(line: 0, character: 24),
             ),
             data: {
               "ref":
@@ -604,13 +604,13 @@ void main() {
             tags: null,
             detail: null,
             filePath: SEMANTIC_TEST_FILE_PATH,
-            range: Range(
-              start: Position(line: 4, character: 0),
-              end: Position(line: 13, character: 1),
+            range: FileRange(
+              start: FilePosition(line: 4, character: 0),
+              end: FilePosition(line: 13, character: 1),
             ),
-            selectionRange: Range(
-              start: Position(line: 5, character: 6),
-              end: Position(line: 5, character: 15),
+            selectionRange: FileRange(
+              start: FilePosition(line: 5, character: 6),
+              end: FilePosition(line: 5, character: 15),
             ),
             data: {
               "ref":

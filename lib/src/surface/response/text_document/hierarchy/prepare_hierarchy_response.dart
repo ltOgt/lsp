@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:collection/collection.dart';
 
-import 'package:lsp/src/surface/param/range.dart';
+import 'package:lsp/src/surface/param/file_range.dart';
 import 'package:lsp/src/surface/response/base_response.dart';
 
 /// The result of one of
@@ -42,12 +42,12 @@ class HierarchyItem {
 
   /// The range enclosing this symbol not including leading/trailing whitespace
   /// but everything else, e.g. comments and code.
-  final Range range;
+  final FileRange range;
 
   /// The range that should be selected and revealed when this symbol is being
   /// picked, e.g. the name of a function. Must be contained by the
   /// [`range`](#CallHierarchyItem.range).
-  final Range selectionRange;
+  final FileRange selectionRange;
 
   /// A data entry field that is preserved between a call hierarchy prepare and
   /// incoming calls or outgoing calls requests.
@@ -93,8 +93,8 @@ class HierarchyItem {
         tags: _decodeTags(map),
         detail: map[_kDetail],
         filePath: (map[_kUri] as String).split(_kUriPrefix).last,
-        range: Range.fromJson(map[_kRange] as Map<String, dynamic>),
-        selectionRange: Range.fromJson(map[_kSelectionRange] as Map<String, dynamic>),
+        range: FileRange.fromJson(map[_kRange] as Map<String, dynamic>),
+        selectionRange: FileRange.fromJson(map[_kSelectionRange] as Map<String, dynamic>),
         data: map[_kData],
       );
 

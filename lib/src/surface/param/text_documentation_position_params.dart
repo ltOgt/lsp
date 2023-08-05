@@ -1,4 +1,4 @@
-import 'package:lsp/src/surface/param/position.dart';
+import 'package:lsp/src/surface/param/file_position.dart';
 import 'package:lsp/src/surface/param/text_document_identifier.dart';
 
 /// Specifies a text document and a position inside that document.
@@ -7,7 +7,7 @@ import 'package:lsp/src/surface/param/text_document_identifier.dart';
 class TextDocumentPositionParams {
   final TextDocumentIdentifier textDocument;
 
-  final Position position;
+  final FilePosition position;
 
   const TextDocumentPositionParams({
     required this.textDocument,

@@ -1,4 +1,4 @@
-import 'package:lsp/src/surface/param/range.dart';
+import 'package:lsp/src/surface/param/file_range.dart';
 import 'package:lsp/src/surface/response/base_response.dart';
 
 /// The result of a "textDocument/hover" request.
@@ -8,7 +8,7 @@ class HoverResponse extends BaseResponse {
   late final Hover hover;
 
   String get contents => hover.contents;
-  Range? get range => hover.range;
+  FileRange? get range => hover.range;
 
   HoverResponse({
     required LspResponse response,
@@ -27,7 +27,7 @@ class Hover {
 
   /// An optional range is a range inside a text document
   /// that is used to visualize a hover, e.g. by changing the background color.
-  final Range? range;
+  final FileRange? range;
 
   Hover({
     required this.contents,
@@ -46,6 +46,6 @@ class Hover {
 
   static Hover fromJson(Map map) => Hover(
         contents: map[_kContents],
-        range: Range.fromJson(map[_kRange] as Map<String, dynamic>),
+        range: FileRange.fromJson(map[_kRange] as Map<String, dynamic>),
       );
 }

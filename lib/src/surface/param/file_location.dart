@@ -1,11 +1,11 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:lsp/src/surface/param/range.dart';
+import 'package:lsp/src/surface/param/file_range.dart';
 
 /// Represents a location inside a resource, such as a line inside a text file.
 ///
 /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#location
 class FileLocation {
-  final Range range;
+  final FileRange range;
 
   final String filePath;
   String get uri => _kUriPrefix + filePath;
@@ -27,7 +27,7 @@ class FileLocation {
       };
 
   static FileLocation fromJson(Map map) => FileLocation(
-        range: Range.fromJson(map[_kRange] as Map<String, dynamic>),
+        range: FileRange.fromJson(map[_kRange] as Map<String, dynamic>),
         filePath: (map[_kUri] as String).split(_kUriPrefix).last,
       );
 
