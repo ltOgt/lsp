@@ -12,7 +12,7 @@ class ServerCapabilities {
   late final bool implementationProvider = capabilities["implementationProvider"] ?? false;
   late final bool referenceProvider = capabilities["referencesProvider"] ?? false;
   late final bool selectionRangeProvider = capabilities["selectionRangeProvider"] ?? false;
-  late final Map semanticTokensProvider = capabilities["semanticTokensProvider"] ?? false;
+  late final Map semanticTokensProvider = capabilities["semanticTokensProvider"];
   late final bool typeHierarchyProvider = capabilities["typeHierarchyProvider"] ?? false;
   late final bool workspaceSymbolProvider = capabilities["workspaceSymbolProvider"] ?? false;
   late final bool typeDefinitionProvider = capabilities["typeDefinitionProvider"] ?? false;

@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:collection/collection.dart';
+import 'package:lsp/src/object/symbol_kind.dart';
 
 import 'package:lsp/src/surface/param/file_range.dart';
 import 'package:lsp/src/surface/response/base_response.dart';
@@ -139,47 +140,4 @@ class HierarchyItem {
   String toString() {
     return 'HierarchyItem(name: $name, kind: $kind, tags: $tags, detail: $detail, filePath: $filePath, range: $range, selectionRange: $selectionRange, data: $data)';
   }
-}
-
-enum SymbolKind {
-  file(1),
-  module(2),
-  namespace(3),
-  package(4),
-  class_(5),
-  method(6),
-  property(7),
-  field(8),
-  constructor(9),
-  enum_(10),
-  interface(11),
-  function(12),
-  variable(13),
-  constant(14),
-  string(15),
-  number(16),
-  boolean(17),
-  array(18),
-  object(19),
-  key(20),
-  null_(21),
-  enumMember(22),
-  struct(23),
-  event(24),
-  operator(25),
-  typeParameter(26);
-
-  const SymbolKind(this.value);
-  final int value;
-
-  static SymbolKind fromValue(int value) => SymbolKind.values[value - 1];
-}
-
-enum SymbolTag {
-  deprecated(1);
-
-  const SymbolTag(this.value);
-  final int value;
-
-  static SymbolTag fromValue(int value) => SymbolTag.values[value - 1];
 }

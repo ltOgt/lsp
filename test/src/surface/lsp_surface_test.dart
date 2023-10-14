@@ -1,6 +1,8 @@
 // ignore_for_file: constant_identifier_names
 import 'dart:io';
 
+import 'package:lsp/src/object/symbol_information.dart';
+import 'package:lsp/src/object/symbol_kind.dart';
 import 'package:test/test.dart';
 
 import 'package:lsp/lsp.dart';
@@ -91,9 +93,13 @@ void main() {
       expect(surface.capabilities.implementationProvider, isTrue);
       expect(surface.capabilities.referenceProvider, isTrue);
       expect(surface.capabilities.selectionRangeProvider, isTrue);
+      expect(surface.capabilities.semanticTokensProvider, isNotEmpty);
       expect(surface.capabilities.typeHierarchyProvider, isTrue);
       expect(surface.capabilities.workspaceSymbolProvider, isTrue);
-      expect(surface.capabilities.typeDefinitionProvider, isFalse); // Not provided by dart server
+      expect(surface.capabilities.typeDefinitionProvider, isTrue);
+
+      print(surface.capabilities.capabilities["documentSymbolProvider"]);
+
       surface.dispose();
     });
 
@@ -247,6 +253,64 @@ void main() {
               end: FilePosition(line: 5, character: 15),
             ),
           ),
+        ),
+      );
+    });
+
+    // =========================================================================
+    // =========================================================================
+    // =========================================================================
+
+    test('Document Symbol', () async {
+      final LspSurface surface = await init();
+      final response = await surface.textDocument_documentSymbol(
+        kTestClassPosition.textDocument,
+      );
+
+      expect(response.error, isNull);
+      expect(response.result, isNull);
+      expect(response.results, isNotNull);
+
+      expect(response.symbols.length, 9);
+
+      expect(
+        response.symbols[0],
+        SymbolInformation(
+          name: "BaseClass",
+          kind: SymbolKind.class_,
+          tags: null,
+          deprecated: false,
+          location: FileLocation(
+            range: FileRange(
+              start: FilePosition(line: 0, character: 15),
+              end: FilePosition(
+                line: 0,
+                character: 24,
+              ),
+            ),
+            filePath: kTestClassPosition.textDocument.filePath,
+          ),
+          containerName: null,
+        ),
+      );
+      expect(
+        response.symbols[1],
+        SymbolInformation(
+          name: "testField",
+          kind: SymbolKind.property,
+          tags: null,
+          deprecated: false,
+          location: FileLocation(
+            range: FileRange(
+              start: FilePosition(line: 1, character: 13),
+              end: FilePosition(
+                line: 1,
+                character: 22,
+              ),
+            ),
+            filePath: kTestClassPosition.textDocument.filePath,
+          ),
+          containerName: "BaseClass",
         ),
       );
     });

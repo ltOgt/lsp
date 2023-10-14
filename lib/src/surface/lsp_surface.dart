@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:io';
 
+import 'package:lsp/lsp.dart';
 import 'package:lsp/src/connector/base_connector.dart';
 import 'package:lsp/src/object/server_capabilities.dart';
 import 'package:lsp/src/object/server_info.dart';
@@ -13,6 +14,7 @@ import 'package:lsp/src/surface/param/reference_params.dart';
 import 'package:lsp/src/surface/param/text_documentation_position_params.dart';
 import 'package:lsp/src/surface/response/base_response.dart';
 import 'package:lsp/src/surface/response/init_response.dart';
+import 'package:lsp/src/surface/response/text_document/document_symbols_response.dart';
 import 'package:lsp/src/surface/response/text_document/hierarchy/hierarchy_items_response.dart';
 import 'package:lsp/src/surface/response/text_document/hierarchy/incoming_call_response.dart';
 import 'package:lsp/src/surface/response/text_document/hierarchy/outgoing_call_response.dart';
@@ -213,6 +215,20 @@ class LspSurface {
 
     final res = await _requestCompleter.sendRequest(_method, params.json);
     return LocationsResponse(response: res);
+  }
+
+  /// Request a list of all symbols for a given [TextDocumentIdentifier].
+  ///
+  /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_documentSymbol
+  Future<DocumentSymbolsResponse> textDocument_documentSymbol(TextDocumentIdentifier textDocumentIdentifier) async {
+    const _method = "textDocument/documentSymbol";
+    if (!capabilities.documentSymbolProvider) throw UnsupportedMethodException(_method);
+
+    final res = await _requestCompleter.sendRequest(_method, {
+      "textDocument": textDocumentIdentifier.json,
+    });
+
+    return DocumentSymbolsResponse(response: res);
   }
 
   /// Request hover information at a given text document position.
