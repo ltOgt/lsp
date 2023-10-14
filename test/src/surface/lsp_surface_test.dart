@@ -1,8 +1,10 @@
 // ignore_for_file: constant_identifier_names
 import 'dart:io';
 
+import 'package:lsp/src/object/folding_range.dart';
 import 'package:lsp/src/object/symbol_information.dart';
 import 'package:lsp/src/object/symbol_kind.dart';
+import 'package:lsp/src/surface/response/text_document/document_folding_range_response.dart';
 import 'package:test/test.dart';
 
 import 'package:lsp/lsp.dart';
@@ -316,6 +318,84 @@ void main() {
     });
 
     // =========================================================================
+    // =========================================================================
+    // =========================================================================
+
+    test('Folding Range', () async {
+      final LspSurface surface = await init();
+      DocumentFoldingRangeResponse r = await surface.textDocument_foldingRange(
+        kTestClassPosition.textDocument,
+      );
+
+      surface.dispose();
+
+      expect(r.ranges.length, 7);
+      expect(
+        r.ranges[0],
+        FoldingRange(
+          endCharacter: 1,
+          endLine: 2,
+          startCharacter: 24,
+          startLine: 0,
+        ),
+      );
+      expect(
+        r.ranges[1],
+        FoldingRange(
+          endCharacter: 1,
+          endLine: 13,
+          startCharacter: 15,
+          startLine: 5,
+        ),
+      );
+      expect(
+        r.ranges[2],
+        FoldingRange(
+          endCharacter: 5,
+          endLine: 12,
+          startCharacter: 11,
+          startLine: 10,
+        ),
+      );
+      expect(
+        r.ranges[3],
+        FoldingRange(
+          endCharacter: 3,
+          endLine: 12,
+          startCharacter: 4,
+          startLine: 11,
+        ),
+      );
+      expect(
+        r.ranges[4],
+        FoldingRange(
+          endCharacter: 1,
+          endLine: 19,
+          startCharacter: 9,
+          startLine: 15,
+        ),
+      );
+      expect(
+        r.ranges[5],
+        FoldingRange(
+          endCharacter: 1,
+          endLine: 23,
+          startCharacter: 14,
+          startLine: 21,
+        ),
+      );
+      expect(
+        r.ranges[6],
+        FoldingRange(
+          endCharacter: 1,
+          endLine: 27,
+          startCharacter: 14,
+          startLine: 25,
+        ),
+      );
+    });
+
+// =========================================================================
     // =========================================================================
     // =========================================================================
 

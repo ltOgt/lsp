@@ -14,6 +14,7 @@ import 'package:lsp/src/surface/param/reference_params.dart';
 import 'package:lsp/src/surface/param/text_documentation_position_params.dart';
 import 'package:lsp/src/surface/response/base_response.dart';
 import 'package:lsp/src/surface/response/init_response.dart';
+import 'package:lsp/src/surface/response/text_document/document_folding_range_response.dart';
 import 'package:lsp/src/surface/response/text_document/document_symbols_response.dart';
 import 'package:lsp/src/surface/response/text_document/hierarchy/hierarchy_items_response.dart';
 import 'package:lsp/src/surface/response/text_document/hierarchy/incoming_call_response.dart';
@@ -229,6 +230,20 @@ class LspSurface {
     });
 
     return DocumentSymbolsResponse(response: res);
+  }
+
+  /// Request a list of all folding ranges for a given [TextDocumentIdentifier].
+  ///
+  /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_foldingRange
+  Future<DocumentFoldingRangeResponse> textDocument_foldingRange(TextDocumentIdentifier textDocumentIdentifier) async {
+    const _method = "textDocument/foldingRange";
+    if (!capabilities.foldingRangeProvider) throw UnsupportedMethodException(_method);
+
+    final res = await _requestCompleter.sendRequest(_method, {
+      "textDocument": textDocumentIdentifier.json,
+    });
+
+    return DocumentFoldingRangeResponse(response: res);
   }
 
   /// Request hover information at a given text document position.
