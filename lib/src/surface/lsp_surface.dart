@@ -10,6 +10,7 @@ import 'package:lsp/lsp.dart';
 import 'package:lsp/src/object/server_capabilities.dart';
 import 'package:lsp/src/object/server_info.dart';
 import 'package:lsp/src/surface/response/base_response.dart';
+import 'package:lsp/src/surface/response/text_document/dart/dart_outline_response.dart';
 import 'package:lsp/src/surface/response/text_document/document_folding_range_response.dart';
 import 'package:lsp/src/surface/response/text_document/document_symbols_response.dart';
 import 'package:lsp/src/surface/unsupported_method_exception.dart';
@@ -426,7 +427,18 @@ class LspSurface {
   // ====================================================================
   // ====================================================================
   // ====================================================================
-  Future<Map> dart_textDocument_outline({required String filePath, required String fileContent}) async {
+
+  /// Dart-Analysis-Server implements the old non-nested and information-poor
+  /// version of [textDocument_documentSymbol].
+  ///
+  /// It does however implement its own notification that returns a nested,
+  /// information-rich outline.
+  ///
+  /// See https://github.com/dart-lang/sdk/blob/main/pkg/analysis_server/tool/lsp_spec/README.md
+  Future<DartOutlineNotification> dart_textDocument_outline({
+    required String filePath,
+    required String fileContent,
+  }) async {
     const _method = "dart/textDocument/publishOutline";
     if (!initializationOptions.containsKey("outline")) {
       throw UnsupportedMethodException(_method);
@@ -466,7 +478,7 @@ class LspSurface {
     // close the file again
     await textDocument_didClose(TextDocumentIdentifier(filePath));
 
-    return outline;
+    return DartOutlineNotification.fromJson(outline);
   }
 }
 

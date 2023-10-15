@@ -6,6 +6,7 @@ import 'package:lsp/src/object/folding_range.dart';
 import 'package:lsp/src/object/markup_content.dart';
 import 'package:lsp/src/object/symbol_information.dart';
 import 'package:lsp/src/object/symbol_kind.dart';
+import 'package:lsp/src/surface/response/text_document/dart/dart_outline_response.dart';
 import 'package:lsp/src/surface/response/text_document/document_folding_range_response.dart';
 import 'package:test/test.dart';
 
@@ -329,7 +330,239 @@ void main() {
         filePath: kTestClassPosition.textDocument.filePath,
         fileContent: await File(kTestClassPosition.textDocument.filePath).readAsString(),
       );
-      print("Outline: $outline");
+
+      expect(
+        outline,
+        DartOutlineNotification(
+          jsonrpc: "2.0",
+          method: "dart/textDocument/publishOutline",
+          params: DartOutlineNotificationParams(
+            uri: "file:///Users/omni/repos/package/lsp/test/_test_data/semantic_token_source.dart",
+            outline: DartOutline(
+              element: ElementDartOutline(
+                name: "<unit>",
+                range: RangeDartOutline(
+                  start: TextPositionDartOutline(character: 0, line: 0),
+                  end: TextPositionDartOutline(character: 0, line: 30),
+                ),
+                kind: "COMPILATION_UNIT",
+                parameters: null,
+                typeParameters: null,
+                returnType: null,
+              ),
+              range: RangeDartOutline(
+                start: TextPositionDartOutline(character: 0, line: 0),
+                end: TextPositionDartOutline(character: 0, line: 30),
+              ),
+              codeRange: RangeDartOutline(
+                start: TextPositionDartOutline(character: 0, line: 0),
+                end: TextPositionDartOutline(character: 0, line: 30),
+              ),
+              children: [
+                DartOutline(
+                  element: ElementDartOutline(
+                    name: "BaseClass",
+                    range: RangeDartOutline(
+                      start: TextPositionDartOutline(character: 15, line: 0),
+                      end: TextPositionDartOutline(character: 24, line: 0),
+                    ),
+                    kind: "CLASS",
+                    parameters: null,
+                    typeParameters: null,
+                    returnType: null,
+                  ),
+                  range: RangeDartOutline(
+                    start: TextPositionDartOutline(character: 0, line: 0),
+                    end: TextPositionDartOutline(character: 1, line: 2),
+                  ),
+                  codeRange: RangeDartOutline(
+                    start: TextPositionDartOutline(character: 0, line: 0),
+                    end: TextPositionDartOutline(character: 1, line: 2),
+                  ),
+                  children: [
+                    DartOutline(
+                      element: ElementDartOutline(
+                        name: "testField",
+                        range: RangeDartOutline(
+                          start: TextPositionDartOutline(character: 13, line: 1),
+                          end: TextPositionDartOutline(character: 22, line: 1),
+                        ),
+                        kind: "GETTER",
+                        parameters: null,
+                        typeParameters: null,
+                        returnType: "String",
+                      ),
+                      range: RangeDartOutline(
+                        start: TextPositionDartOutline(character: 2, line: 1),
+                        end: TextPositionDartOutline(character: 23, line: 1),
+                      ),
+                      codeRange: RangeDartOutline(
+                        start: TextPositionDartOutline(character: 2, line: 1),
+                        end: TextPositionDartOutline(character: 23, line: 1),
+                      ),
+                      children: null,
+                    )
+                  ],
+                ),
+                DartOutline(
+                  element: ElementDartOutline(
+                    name: "TestClass",
+                    range: RangeDartOutline(
+                      start: TextPositionDartOutline(character: 6, line: 5),
+                      end: TextPositionDartOutline(character: 15, line: 5),
+                    ),
+                    kind: "CLASS",
+                    parameters: null,
+                    typeParameters: null,
+                    returnType: null,
+                  ),
+                  range: RangeDartOutline(
+                    start: TextPositionDartOutline(character: 0, line: 4),
+                    end: TextPositionDartOutline(character: 1, line: 13),
+                  ),
+                  codeRange: RangeDartOutline(
+                    start: TextPositionDartOutline(character: 0, line: 5),
+                    end: TextPositionDartOutline(character: 1, line: 13),
+                  ),
+                  children: [
+                    DartOutline(
+                      element: ElementDartOutline(
+                        name: "testField",
+                        range: RangeDartOutline(
+                          start: TextPositionDartOutline(character: 15, line: 7),
+                          end: TextPositionDartOutline(character: 24, line: 7),
+                        ),
+                        kind: "FIELD",
+                        parameters: null,
+                        typeParameters: null,
+                        returnType: "String",
+                      ),
+                      range: RangeDartOutline(
+                        start: TextPositionDartOutline(character: 2, line: 6),
+                        end: TextPositionDartOutline(character: 25, line: 7),
+                      ),
+                      codeRange: RangeDartOutline(
+                        start: TextPositionDartOutline(character: 15, line: 7),
+                        end: TextPositionDartOutline(character: 24, line: 7),
+                      ),
+                      children: null,
+                    ),
+                    DartOutline(
+                      element: ElementDartOutline(
+                        name: "TestClass",
+                        range: RangeDartOutline(
+                          start: TextPositionDartOutline(character: 2, line: 10),
+                          end: TextPositionDartOutline(character: 11, line: 10),
+                        ),
+                        kind: "CONSTRUCTOR",
+                        parameters: "({required this.testField})",
+                        typeParameters: null,
+                        returnType: null,
+                      ),
+                      range: RangeDartOutline(
+                        start: TextPositionDartOutline(character: 2, line: 9),
+                        end: TextPositionDartOutline(character: 5, line: 12),
+                      ),
+                      codeRange: RangeDartOutline(
+                        start: TextPositionDartOutline(character: 2, line: 10),
+                        end: TextPositionDartOutline(character: 5, line: 12),
+                      ),
+                      children: null,
+                    )
+                  ],
+                ),
+                DartOutline(
+                  element: ElementDartOutline(
+                      name: "main",
+                      range: RangeDartOutline(
+                        start: TextPositionDartOutline(character: 5, line: 15),
+                        end: TextPositionDartOutline(character: 9, line: 15),
+                      ),
+                      kind: "FUNCTION",
+                      parameters: "(List<String> args)",
+                      typeParameters: null,
+                      returnType: "void"),
+                  range: RangeDartOutline(
+                    start: TextPositionDartOutline(character: 0, line: 15),
+                    end: TextPositionDartOutline(character: 1, line: 19),
+                  ),
+                  codeRange: RangeDartOutline(
+                    start: TextPositionDartOutline(character: 0, line: 15),
+                    end: TextPositionDartOutline(character: 1, line: 19),
+                  ),
+                  children: null,
+                ),
+                DartOutline(
+                  element: ElementDartOutline(
+                    name: "outerCall",
+                    range: RangeDartOutline(
+                      start: TextPositionDartOutline(character: 5, line: 21),
+                      end: TextPositionDartOutline(character: 14, line: 21),
+                    ),
+                    kind: "FUNCTION",
+                    parameters: "()",
+                    typeParameters: null,
+                    returnType: "void",
+                  ),
+                  range: RangeDartOutline(
+                    start: TextPositionDartOutline(character: 0, line: 21),
+                    end: TextPositionDartOutline(character: 1, line: 23),
+                  ),
+                  codeRange: RangeDartOutline(
+                    start: TextPositionDartOutline(character: 0, line: 21),
+                    end: TextPositionDartOutline(character: 1, line: 23),
+                  ),
+                  children: null,
+                ),
+                DartOutline(
+                  element: ElementDartOutline(
+                    name: "innerCall",
+                    range: RangeDartOutline(
+                      start: TextPositionDartOutline(character: 5, line: 25),
+                      end: TextPositionDartOutline(character: 14, line: 25),
+                    ),
+                    kind: "FUNCTION",
+                    parameters: "()",
+                    typeParameters: null,
+                    returnType: "void",
+                  ),
+                  range: RangeDartOutline(
+                    start: TextPositionDartOutline(character: 0, line: 25),
+                    end: TextPositionDartOutline(character: 1, line: 27),
+                  ),
+                  codeRange: RangeDartOutline(
+                    start: TextPositionDartOutline(character: 0, line: 25),
+                    end: TextPositionDartOutline(character: 1, line: 27),
+                  ),
+                  children: null,
+                ),
+                DartOutline(
+                  element: ElementDartOutline(
+                    name: "anotherCall",
+                    range: RangeDartOutline(
+                      start: TextPositionDartOutline(character: 5, line: 29),
+                      end: TextPositionDartOutline(character: 16, line: 29),
+                    ),
+                    kind: "FUNCTION",
+                    parameters: "()",
+                    typeParameters: null,
+                    returnType: "void",
+                  ),
+                  range: RangeDartOutline(
+                    start: TextPositionDartOutline(character: 0, line: 29),
+                    end: TextPositionDartOutline(character: 21, line: 29),
+                  ),
+                  codeRange: RangeDartOutline(
+                    start: TextPositionDartOutline(character: 0, line: 29),
+                    end: TextPositionDartOutline(character: 21, line: 29),
+                  ),
+                  children: null,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
 
       surface.dispose();
     });
