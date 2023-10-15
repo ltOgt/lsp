@@ -13,11 +13,20 @@ class MarkupContent {
         "value": value,
       };
 
-  static MarkupContent fromJson(Map map) {
-    return MarkupContent(
-      kind: map['kind'] as String,
-      value: map['value'] as String,
-    );
+  static MarkupContent fromJson(dynamic value) {
+    if (value is Map) {
+      return MarkupContent(
+        kind: value['kind'] as String,
+        value: value['value'] as String,
+      );
+    }
+    if (value is String) {
+      return MarkupContent(
+        kind: "plaintext",
+        value: value,
+      );
+    }
+    throw StateError("Unsupported type: $value");
   }
 
   // ===========================================================================
