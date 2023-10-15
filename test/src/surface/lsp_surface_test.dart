@@ -47,7 +47,11 @@ const kInnerCallPosition = TextDocumentPositionParams(
 // =============================================================================
 // =============================================================================
 
-Future<LspSurface> init() {
+Future<LspSurface> init({
+  Map clientCapabilities = const {},
+  Map initializationOptions = const {},
+  void Function(Map<dynamic, dynamic>)? onMessage,
+}) {
   final connector = LspConnectorDart(
     analysisServerPath: ANALYSIS_PATH,
     clientId: "clientId",
@@ -56,7 +60,9 @@ Future<LspSurface> init() {
   return LspSurface.start(
     lspConnector: connector,
     rootPath: ROOT_PATH,
-    clientCapabilities: {},
+    clientCapabilities: clientCapabilities,
+    initializationOptions: initializationOptions,
+    onMessage: onMessage,
   );
 }
 
@@ -312,6 +318,46 @@ void main() {
     });
 
     // =========================================================================
+
+    test('dart/textDocument/publishOutline', () async {
+      final outlineCompleter = Completer<Map>();
+
+      final LspSurface surface = await init(
+        initializationOptions: {
+          "outline": true,
+        },
+        onMessage: (map) {
+          if (outlineCompleter.isCompleted) return;
+          if (map["method"] == "dart/textDocument/publishOutline") {
+            outlineCompleter.complete(map);
+          }
+        },
+      );
+
+      final didOpenResponse = await surface.textDocument_didOpen(
+        filePath: kTestClassPosition.textDocument.filePath,
+        fileContent: await File(kTestClassPosition.textDocument.filePath).readAsString(),
+      );
+      expect(didOpenResponse.error, isNull);
+      expect(didOpenResponse.results, isNull);
+      expect(didOpenResponse.result, {});
+
+      await surface.textDocument_hover(
+        TextDocumentPositionParams(
+          textDocument: kTestClassPosition.textDocument,
+          position: FilePosition(line: 0, character: 0),
+        ),
+      );
+
+      // await surface.textDocument_semanticTokens_full(
+      //   filePath: kTestClassPosition.textDocument.filePath,
+      // );
+
+      final outline = await outlineCompleter.future;
+      print("Outline: $outline");
+    }, timeout: Timeout.none);
+
+    // =========================================================================
     // =========================================================================
     // =========================================================================
 
@@ -394,8 +440,43 @@ void main() {
     // =========================================================================
 
     group("Hover", () {
-      test('TestClass', () async {
+      test('TestClass - no capabilities', () async {
         final LspSurface surface = await init();
+        HoverResponse r = await surface.textDocument_hover(
+          kTestClassPosition,
+        );
+
+        surface.dispose();
+
+        const _expectedHover = MarkupContent(
+          kind: "plaintext",
+          value: """```dart
+class TestClass extends BaseClass
+```
+*test/_test_data/semantic_token_source.dart*
+
+---
+This is the docstring for [TestClass]""",
+        );
+
+        expect(r.contents, _expectedHover);
+        expect(
+          r.range,
+          FileRange(
+            start: FilePosition(line: 5, character: 6),
+            end: FilePosition(line: 5, character: 15),
+          ),
+        );
+      });
+
+      test('TestClass - hover content type capability', () async {
+        final LspSurface surface = await init(clientCapabilities: {
+          "textDocument": {
+            "hover": {
+              "contentFormat": ["markdown", "plaintext"],
+            }
+          },
+        });
         HoverResponse r = await surface.textDocument_hover(
           kTestClassPosition,
         );
