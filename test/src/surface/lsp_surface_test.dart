@@ -1,7 +1,9 @@
 // ignore_for_file: constant_identifier_names
+import 'dart:async';
 import 'dart:io';
 
 import 'package:lsp/src/object/folding_range.dart';
+import 'package:lsp/src/object/markup_content.dart';
 import 'package:lsp/src/object/symbol_information.dart';
 import 'package:lsp/src/object/symbol_kind.dart';
 import 'package:lsp/src/surface/response/text_document/document_folding_range_response.dart';
@@ -40,14 +42,6 @@ const kInnerCallPosition = TextDocumentPositionParams(
     character: 10,
   ),
 );
-
-const _expectedHover = """```dart
-class TestClass extends BaseClass
-```
-*test/_test_data/semantic_token_source.dart*
-
----
-This is the docstring for [TestClass]""";
 
 // =============================================================================
 // =============================================================================
@@ -395,26 +389,39 @@ void main() {
       );
     });
 
-// =========================================================================
     // =========================================================================
     // =========================================================================
+    // =========================================================================
 
-    test('Hover', () async {
-      final LspSurface surface = await init();
-      HoverResponse r = await surface.textDocument_hover(
-        kTestClassPosition,
-      );
+    group("Hover", () {
+      test('TestClass', () async {
+        final LspSurface surface = await init();
+        HoverResponse r = await surface.textDocument_hover(
+          kTestClassPosition,
+        );
 
-      surface.dispose();
+        surface.dispose();
 
-      expect(r.contents, _expectedHover);
-      expect(
-        r.range,
-        FileRange(
-          start: FilePosition(line: 5, character: 6),
-          end: FilePosition(line: 5, character: 15),
-        ),
-      );
+        const _expectedHover = MarkupContent(
+          kind: "markdown",
+          value: """```dart
+class TestClass extends BaseClass
+```
+*test/_test_data/semantic_token_source.dart*
+
+---
+This is the docstring for [TestClass]""",
+        );
+
+        expect(r.contents, _expectedHover);
+        expect(
+          r.range,
+          FileRange(
+            start: FilePosition(line: 5, character: 6),
+            end: FilePosition(line: 5, character: 15),
+          ),
+        );
+      });
     });
 
     // =========================================================================
