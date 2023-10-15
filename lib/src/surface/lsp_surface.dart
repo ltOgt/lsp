@@ -49,11 +49,17 @@ class LspSurface {
 
   final MessageCallback? onMessage;
 
+  final StreamController<Map> internalMessageStream;
+
+  final Map initializationOptions;
+
   LspSurface._({
     required this.lspConnector,
     required this.lspProcess,
     required _RequestCompleter requestCompleter,
     required this.onMessage,
+    required this.internalMessageStream,
+    required this.initializationOptions,
   }) : _requestCompleter = requestCompleter;
 
   /// Launch the Connection handler.
@@ -64,15 +70,20 @@ class LspSurface {
     required LspConnectorBase lspConnector,
     required String rootPath,
     required Map clientCapabilities,
+    Map initializationOptions = const {},
     MessageCallback? onMessage,
   }) async {
     // Start process
     final process = await lspConnector.startProcess();
 
+    // to listen to messages from the server internally
+    final internalMessageStream = StreamController<Map>.broadcast();
+
     // Setup request => response completer
     final requestCompleter = _RequestCompleter(
       process: process,
       onMessage: onMessage,
+      internalMessageStream: internalMessageStream,
     );
 
     // Create object
@@ -81,12 +92,15 @@ class LspSurface {
       lspProcess: process,
       requestCompleter: requestCompleter,
       onMessage: onMessage,
+      internalMessageStream: internalMessageStream,
+      initializationOptions: initializationOptions,
     );
 
     // Initialized LSP handshake
     final r1 = await lsm._initializeConnection(
       rootPath: rootPath,
       clientCapabilities: clientCapabilities,
+      initializationOptions: initializationOptions,
       clientId: lspConnector.clientId,
       clientVersion: lspConnector.clientVersion,
     );
@@ -114,7 +128,10 @@ class LspSurface {
     return lsm;
   }
 
-  bool dispose() => lspProcess.kill();
+  bool dispose() {
+    internalMessageStream.close();
+    return lspProcess.kill();
+  }
 
   // ====================================================================
   /// Initialize the connection between Client and LSP Server
@@ -123,6 +140,7 @@ class LspSurface {
   Future<InitResponse> _initializeConnection({
     required String rootPath,
     Map clientCapabilities = const {},
+    Map initializationOptions = const {},
     required String clientId,
     required String clientVersion,
   }) async {
@@ -134,6 +152,7 @@ class LspSurface {
       "processId": null,
       "clientInfo": clientInfo,
       "capabilities": clientCapabilities,
+      "initializationOptions": initializationOptions,
       // ? deprecated according to spec, but must be provided anyway
       "rootUri": "file://" + rootPath,
     };
@@ -393,11 +412,14 @@ class _RequestCompleter {
   /// For non response messages
   final MessageCallback? onMessage;
 
+  final StreamController<Map> internalMessageStream;
+
   // ===========================================================================
 
   _RequestCompleter({
     required Process process,
     required this.onMessage,
+    required this.internalMessageStream,
   }) {
     /// Bind stdin / std out of process
     lspChannel(process.stdout, process.stdin).stream.listen(
@@ -478,6 +500,8 @@ class _RequestCompleter {
       // § {"method":"$/analyzerStatus","params":{"isAnalyzing":true},"jsonrpc":"2.0"}
       // § {"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics"...
       onMessage?.call(json);
+      internalMessageStream.add(json);
+
     } else {
       int requestID = json["id"];
       if (_responses.containsKey(requestID)) {
