@@ -482,6 +482,10 @@ class _RequestCompleter {
 
     // Send message
     lspProcessStdin.add(headerASCII + contentUTF8);
+    assert(() {
+      log("REQ<$_currentId>:$contentJSON");
+      return true;
+    }());
 
     /// Create a completer and listen to stdout to complete once a response arives
     final completer = Completer<LspResponse>();
@@ -502,11 +506,19 @@ class _RequestCompleter {
       onMessage?.call(json);
       internalMessageStream.add(json);
 
+      assert(() {
+        log("MSG:$json");
+        return true;
+      }());
     } else {
       int requestID = json["id"];
       if (_responses.containsKey(requestID)) {
         _responses[requestID]!.complete(LspResponse.fromMap(json));
         _responses.remove(requestID);
+        assert(() {
+          log("RES:$json");
+          return true;
+        }());
       } else {
         throw ("Received Response for Request that does not exist or has already completed: $requestID");
       }
