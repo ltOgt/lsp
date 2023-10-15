@@ -173,6 +173,32 @@ class LspSurface {
   }
 
   // ====================================================================
+  /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_didOpen
+  Future<LspResponse> textDocument_didOpen({required String filePath, required String fileContent}) async {
+    var params = {
+      "textDocument": {
+        "uri": "file://$filePath",
+        "languageId": "dart",
+        "version": 1,
+        "text": fileContent,
+      },
+    };
+
+    final res = await _requestCompleter.sendRequest("textDocument/didOpen", params);
+    return res;
+  }
+
+  /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_didClose
+  Future<LspResponse> textDocument_didClose(TextDocumentIdentifier textDocumentIdentifier) async {
+    var params = {
+      "textDocument": textDocumentIdentifier,
+    };
+
+    final res = await _requestCompleter.sendRequest("textDocument/didClose", params);
+    return res;
+  }
+
+  // ====================================================================
   /// Get [SemanticTokenType]s and [SemanticTokenModifier]s for the whole file at [filePath].
   /// Use [SemanticTokenDecoder] to decode the [SemanticTokenFullResponse.data].
   ///
@@ -499,8 +525,7 @@ class _RequestCompleter {
   _handleResponse(String response) {
     final json = jsonDecode(response);
 
-    if (false == json.containsKey("id")) {
-      // Skip other messages for now
+    if (!json.containsKey("id") || json.containsKey("method")) {
       // § {"method":"$/analyzerStatus","params":{"isAnalyzing":true},"jsonrpc":"2.0"}
       // § {"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics"...
       onMessage?.call(json);
