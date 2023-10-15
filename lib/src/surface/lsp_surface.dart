@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:typed_data';
 import 'dart:io';
 
@@ -418,6 +419,54 @@ class LspSurface {
       from: item,
       kind: HierarchyItemsResponseKind.subType,
     );
+  }
+
+  // ====================================================================
+  // ====================================================================
+  // ====================================================================
+  // ====================================================================
+  // ====================================================================
+  Future<Map> dart_textDocument_outline({required String filePath, required String fileContent}) async {
+    const _method = "dart/textDocument/publishOutline";
+    if (!initializationOptions.containsKey("outline")) {
+      throw UnsupportedMethodException(_method);
+    }
+
+    final textDocumentIdentifier = TextDocumentIdentifier(filePath);
+
+    final outlineFuture = internalMessageStream.stream.firstWhere(
+      (msg) {
+        bool matchMethod = msg["method"] == _method;
+        bool matchUri = msg["params"]["uri"] == textDocumentIdentifier.uri;
+
+        print("outline listener: $msg");
+        print("matchMethod: $matchMethod");
+        print("matchUri: $matchUri");
+        return matchMethod && matchUri;
+      },
+    );
+
+    // the file has to be opened for the dart server to send outline messages
+    final r = await textDocument_didOpen(filePath: filePath, fileContent: fileContent);
+    if (r.isError) throw r.error!;
+
+    // need any interaction with the open document to trigger the outline message
+    // this is undocumented, but I found this by trial and error and looking at
+    // the logs from vscode talking to dart LSP
+    final _ = await textDocument_hover(
+      TextDocumentPositionParams(
+        textDocument: textDocumentIdentifier,
+        position: FilePosition(line: 0, character: 0),
+      ),
+    );
+
+    // wait for the message
+    final outline = await outlineFuture;
+
+    // close the file again
+    await textDocument_didClose(TextDocumentIdentifier(filePath));
+
+    return outline;
   }
 }
 

@@ -318,44 +318,21 @@ void main() {
     });
 
     // =========================================================================
-
     test('dart/textDocument/publishOutline', () async {
-      final outlineCompleter = Completer<Map>();
-
       final LspSurface surface = await init(
         initializationOptions: {
           "outline": true,
         },
-        onMessage: (map) {
-          if (outlineCompleter.isCompleted) return;
-          if (map["method"] == "dart/textDocument/publishOutline") {
-            outlineCompleter.complete(map);
-          }
-        },
       );
 
-      final didOpenResponse = await surface.textDocument_didOpen(
+      final outline = await surface.dart_textDocument_outline(
         filePath: kTestClassPosition.textDocument.filePath,
         fileContent: await File(kTestClassPosition.textDocument.filePath).readAsString(),
       );
-      expect(didOpenResponse.error, isNull);
-      expect(didOpenResponse.results, isNull);
-      expect(didOpenResponse.result, {});
-
-      await surface.textDocument_hover(
-        TextDocumentPositionParams(
-          textDocument: kTestClassPosition.textDocument,
-          position: FilePosition(line: 0, character: 0),
-        ),
-      );
-
-      // await surface.textDocument_semanticTokens_full(
-      //   filePath: kTestClassPosition.textDocument.filePath,
-      // );
-
-      final outline = await outlineCompleter.future;
       print("Outline: $outline");
-    }, timeout: Timeout.none);
+
+      surface.dispose();
+    });
 
     // =========================================================================
     // =========================================================================
