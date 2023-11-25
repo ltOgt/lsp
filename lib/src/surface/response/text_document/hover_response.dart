@@ -6,10 +6,10 @@ import 'package:lsp/src/surface/response/base_response.dart';
 ///
 /// See [Hover] for details.
 class HoverResponse extends BaseResponse {
-  late final Hover hover;
+  late final Hover? hover;
 
-  MarkupContent get contents => hover.contents;
-  FileRange? get range => hover.range;
+  MarkupContent? get contents => hover?.contents;
+  FileRange? get range => hover?.range;
 
   HoverResponse({
     required LspResponse response,
@@ -45,7 +45,9 @@ class Hover {
         if (range != null) _kRange: range!.json,
       };
 
-  static Hover fromJson(Map map) {
+  static Hover? fromJson(Map map) {
+    if (map.isEmpty) return null;
+
     return Hover(
       contents: MarkupContent.fromJson(map[_kContents] as dynamic),
       range: FileRange.fromJson(map[_kRange] as Map<String, dynamic>),
