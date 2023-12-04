@@ -20,5 +20,5 @@ void main() async {
   await Future.delayed(Duration(seconds: 2));
 
   final tokenResponse = await surface.textDocument_semanticTokens_full(filePath: ROOT_PATH + "/lib/material.dart");
-  print(SemanticTokenDecoder.decodeTokens(tokenResponse.data));
+  //print(SemanticTokenDecoder.decodeTokens(tokenResponse.data));
 }

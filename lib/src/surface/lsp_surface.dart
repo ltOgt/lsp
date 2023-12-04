@@ -451,9 +451,9 @@ class LspSurface {
         bool matchMethod = msg["method"] == _method;
         bool matchUri = msg["params"]["uri"] == textDocumentIdentifier.uri;
 
-        print("outline listener: $msg");
-        print("matchMethod: $matchMethod");
-        print("matchUri: $matchUri");
+        // print("outline listener: $msg");
+        // print("matchMethod: $matchMethod");
+        // print("matchUri: $matchUri");
         return matchMethod && matchUri;
       },
     );
@@ -543,7 +543,7 @@ class _RequestCompleter {
   ///
   /// Returns a Future that will complete once the matching response arrives.
   Future<LspResponse> sendRequest(String method, Map params) {
-    print("[$pid] <$_currentId> sending: $method");
+    //print("[$pid] <$_currentId> sending: $method");
 
     var content = {
       "jsonrpc": "2.0",
