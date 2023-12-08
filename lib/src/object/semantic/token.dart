@@ -1,3 +1,6 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:collection/collection.dart';
+
 import 'package:lsp/lsp.dart';
 
 /// Semantic Token.
@@ -27,5 +30,30 @@ class SemanticToken {
   @override
   String toString() {
     return 'SemanticToken(row: $row, start: $start, length: $length, tokenType: $tokenType, tokenModifiers: $tokenModifiers)';
+  }
+
+  @override
+  bool operator ==(covariant SemanticToken other) {
+    if (identical(this, other)) return true;
+    final listEquals = const DeepCollectionEquality().equals;
+
+    return other.row == row &&
+        other.start == start &&
+        other.length == length &&
+        other.tokenType == tokenType &&
+        listEquals(other.tokenModifiers, tokenModifiers);
+  }
+
+  @override
+  int get hashCode {
+    final listHash = const DeepCollectionEquality().hash;
+
+    return row.hashCode ^
+        start.hashCode ^
+        length.hashCode ^
+        tokenType.hashCode ^
+        listHash(
+          tokenModifiers,
+        );
   }
 }
