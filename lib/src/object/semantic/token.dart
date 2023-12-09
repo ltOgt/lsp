@@ -19,7 +19,7 @@ class SemanticToken {
   final int tokenType;
   final List<int> tokenModifiers;
 
-  SemanticToken({
+  const SemanticToken({
     required this.row,
     required this.start,
     required this.length,
