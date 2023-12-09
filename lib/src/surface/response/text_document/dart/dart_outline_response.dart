@@ -169,7 +169,7 @@ class DartOutline {
 
   @override
   String toString() {
-    return 'DartOutline(element: $element, range: $range, codeRange: $codeRange, children: $children)';
+    return 'DartOutline(element: $element, range: $range, codeRange: $codeRange, children: $children,)';
   }
 }
 
@@ -231,7 +231,7 @@ class ElementDartOutline {
 
   @override
   String toString() {
-    return 'ElementDartOutline(name: $name, range: $range, kind: $kind, parameters: $parameters, typeParameters: $typeParameters, returnType: $returnType)';
+    return 'ElementDartOutline(name: "$name", range: $range, kind: "$kind", parameters: ${parameters == null ? null : '"$parameters"'}, typeParameters: ${typeParameters == null ? null : '"$typeParameters"'}, returnType: ${returnType == null ? null : '"$returnType"'},)';
   }
 }
 
@@ -263,7 +263,7 @@ class RangeDartOutline {
   // ===========================================================================
 
   @override
-  String toString() => 'RangeDartOutline(start: $start, end: $end)';
+  String toString() => 'RangeDartOutline(start: $start, end: $end,)';
 }
 
 class TextPositionDartOutline {
