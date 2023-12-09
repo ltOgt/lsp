@@ -49,7 +49,7 @@ class DartOutlineNotification {
   final String method;
   final DartOutlineNotificationParams params;
 
-  DartOutlineNotification({
+  const DartOutlineNotification({
     required this.jsonrpc,
     required this.method,
     required this.params,
@@ -85,7 +85,7 @@ class DartOutlineNotificationParams {
   final String uri;
   final DartOutline outline;
 
-  DartOutlineNotificationParams({
+  const DartOutlineNotificationParams({
     required this.uri,
     required this.outline,
   });
@@ -126,7 +126,7 @@ class DartOutline {
   final RangeDartOutline codeRange;
   final List<DartOutline>? children;
 
-  DartOutline({
+  const DartOutline({
     required this.range,
     required this.codeRange,
     required this.element,
@@ -183,7 +183,7 @@ class ElementDartOutline {
   final String? typeParameters;
   final String? returnType;
 
-  ElementDartOutline({
+  const ElementDartOutline({
     required this.name,
     required this.range,
     required this.kind,
@@ -239,7 +239,7 @@ class RangeDartOutline {
   final TextPositionDartOutline start;
   final TextPositionDartOutline end;
 
-  RangeDartOutline({required this.start, required this.end});
+  const RangeDartOutline({required this.start, required this.end});
 
   factory RangeDartOutline.fromJson(Map<String, dynamic> json) {
     return RangeDartOutline(
@@ -270,7 +270,7 @@ class TextPositionDartOutline {
   final int character;
   final int line;
 
-  TextPositionDartOutline({required this.character, required this.line});
+  const TextPositionDartOutline({required this.character, required this.line});
 
   factory TextPositionDartOutline.fromJson(Map<String, dynamic> json) {
     return TextPositionDartOutline(
