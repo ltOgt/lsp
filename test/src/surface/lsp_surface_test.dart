@@ -6,8 +6,8 @@ import 'package:lsp/src/object/folding_range.dart';
 import 'package:lsp/src/object/markup_content.dart';
 import 'package:lsp/src/object/symbol_information.dart';
 import 'package:lsp/src/object/symbol_kind.dart';
-import 'package:lsp/src/surface/response/text_document/dart/dart_outline_response.dart';
 import 'package:lsp/src/surface/response/text_document/document_folding_range_response.dart';
+import 'package:lsp/src/surface/response/workspace/workspace_symbol_response.dart';
 import 'package:test/test.dart';
 
 import 'package:lsp/lsp.dart';
@@ -1061,6 +1061,62 @@ This is the docstring for [TestClass]""",
           ),
         );
       });
+    });
+
+    // =========================================================================
+    // =========================================================================
+    // =========================================================================
+
+    test('Workspace Symbol', () async {
+      final LspSurface surface = await init();
+      WorkspaceSymbolResponse r = await surface.workspace_symbol(
+        "TestClass",
+      );
+
+      surface.dispose();
+
+      expect(r.symbols, isNotNull);
+      expect(r.symbols!.length, greaterThanOrEqualTo(2));
+      // there are more symbols commint from other projects like flutter
+      // but the first two should be from semantic_token_source
+
+      expect(
+        r.symbols!.first,
+        SymbolInformation(
+          name: "TestClass",
+          kind: SymbolKind.class_,
+          location: FileLocation(
+            filePath: kTestClassPosition.textDocument.filePath,
+            range: FileRange(
+              // The whole block of the class
+              start: FilePosition(line: 4, character: 0),
+              end: FilePosition(line: 13, character: 1),
+            ),
+          ),
+          tags: null,
+          deprecated: null,
+          containerName: null,
+        ),
+      );
+
+      // definition of test handle
+      expect(
+        r.symbols![1],
+        SymbolInformation(
+          name: "kTestClassPosition",
+          kind: SymbolKind.variable,
+          tags: null,
+          deprecated: null,
+          location: FileLocation(
+            range: FileRange(
+              start: FilePosition(line: 21, character: 0),
+              end: FilePosition(line: 28, character: 1),
+            ),
+            filePath: "/Users/omni/repos/package/lsp/test/src/surface/lsp_surface_test.dart",
+          ),
+          containerName: null,
+        ),
+      );
     });
   });
 }

@@ -13,6 +13,7 @@ import 'package:lsp/src/surface/response/base_response.dart';
 import 'package:lsp/src/surface/response/text_document/dart/dart_outline_response.dart';
 import 'package:lsp/src/surface/response/text_document/document_folding_range_response.dart';
 import 'package:lsp/src/surface/response/text_document/document_symbols_response.dart';
+import 'package:lsp/src/surface/response/workspace/workspace_symbol_response.dart';
 import 'package:lsp/src/surface/unsupported_method_exception.dart';
 import 'package:lsp/src/surface/wireformat.dart';
 
@@ -420,6 +421,21 @@ class LspSurface {
       from: item,
       kind: HierarchyItemsResponseKind.subType,
     );
+  }
+
+  /// Request to list project-wide symbols matching the query string.
+  ///
+  /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#workspace_symbol
+  Future<WorkspaceSymbolResponse> workspace_symbol(String query) async {
+    const _method = "workspace/symbol";
+    if (!capabilities.workspaceSymbolProvider) throw UnsupportedMethodException(_method);
+
+    final params = {
+      "query": query,
+    };
+
+    final res = await _requestCompleter.sendRequest(_method, params);
+    return WorkspaceSymbolResponse(response: res);
   }
 
   // ====================================================================
