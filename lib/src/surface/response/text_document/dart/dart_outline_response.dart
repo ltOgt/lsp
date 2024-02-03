@@ -126,6 +126,9 @@ class DartOutline {
   final RangeDartOutline codeRange;
   final List<DartOutline>? children;
 
+  bool get hasCommentOrAnnotation => codeRange.start.line > range.start.line;
+  int get leadingCommentLineCount => codeRange.start.line - range.start.line;
+
   const DartOutline({
     required this.range,
     required this.codeRange,
