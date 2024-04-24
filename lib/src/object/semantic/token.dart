@@ -12,7 +12,7 @@ import 'package:lsp/lsp.dart';
 /// [length] is the absoulte length of the token.
 /// [tokenType] needs to be resolved via [SemanticTokenLegend.tokenTypes]
 /// [tokenModifiers] need to be resolved via [SemanticTokenLegend.tokenModifiers]
-class SemanticToken {
+class SemanticToken implements Comparable<SemanticToken> {
   final int row;
   final int start;
   final int length;
@@ -55,5 +55,14 @@ class SemanticToken {
         listHash(
           tokenModifiers,
         );
+  }
+
+  @override
+  int compareTo(SemanticToken other) {
+    final rowDiff = row - other.row;
+    if (rowDiff != 0) return rowDiff;
+    final startDiff = start - other.start;
+    if (startDiff != 0) return startDiff;
+    return length - other.length;
   }
 }
